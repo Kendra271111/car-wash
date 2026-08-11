@@ -5,7 +5,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../.prisma/client"
 }
 
 datasource db {
@@ -78,6 +78,8 @@ model order_items {
   id        Int      @id @default(autoincrement())
   orderId   Int
   order     orders   @relation(fields: [orderId], references: [id])
+  serviceId Int
+  service   services @relation(fields: [serviceId], references: [id])
   duration  Int
   amount    Float
   price     Float
@@ -85,4 +87,16 @@ model order_items {
   subtotal  Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
+}
+
+model services {
+  id        Int      @id @default(autoincrement())
+  name      String
+  duration  Float
+  price     Float
+  qty       Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+
+  order_items order_items[]
 }

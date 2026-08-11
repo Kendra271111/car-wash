@@ -1,8 +1,4 @@
-import axios from 'axios'
-
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
-})
+import { api } from '../services/api'
 
 export const statusColors = {
   PENDING: 'badge-warning',
@@ -36,12 +32,12 @@ export const computeStats = (orders) => {
 
 export const fetchOrders = async () => {
   const res = await api.get('/orders')
-  return res.data || []
+  return res.data.data || []
 }
 
 export const fetchOrderById = async (id) => {
   const res = await api.get(`/orders/${id}`)
-  return res.data
+  return res.data.data
 }
 
 export const createOrder = async (orderData) => {
@@ -50,7 +46,7 @@ export const createOrder = async (orderData) => {
 }
 
 export const updateOrder = async (id, orderData) => {
-  const res = await api.patch(`/orders/${id}`, orderData)
+  const res = await api.put(`/orders/${id}`, orderData)
   return res.data
 }
 
