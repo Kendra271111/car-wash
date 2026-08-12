@@ -3,12 +3,16 @@ import Sidebar from './components/ui/sidebar.jsx'
 import Index from './components/index.jsx'
 import Orders from './components/pages/orders/orders.jsx'
 import CreateOrder from './components/pages/orders/createOrders.jsx'
+import EditOrder from './components/pages/orders/editOrders.jsx'
+import ViewOrder from './components/pages/orders/viewOrders.jsx'
 import Services from './components/pages/services/services.jsx'
 import CreateServices from './components/pages/services/createServices.jsx'
 import Payments from './components/pages/payments.jsx'
 import History from './components/pages/history.jsx'
 import Customers from './components/pages/customers/customers.jsx'
 import CreateCustomer from './components/pages/customers/createCustomer.jsx'
+import Staff from './components/pages/staff/staff.jsx'
+import CreateStaff from './components/pages/staff/createStaff.jsx'
 import Vehicles from './components/pages/vehicles/vehicles.jsx'
 import CreateVehicle from './components/pages/vehicles/createVehicle.jsx'
 import Reports from './components/pages/reports.jsx'
@@ -36,12 +40,16 @@ function App() {
           <Route path="/dashboard" element={<Index />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/orders/create" element={<CreateOrder />} />
+          <Route path="/orders/:id/edit" element={<EditOrder />} />
+          <Route path="/orders/:id" element={<ViewOrder />} />
           <Route path="/services" element={<Services />} />
           <Route path="/services/create" element={<CreateServices />} />
           <Route path="/payments" element={<Payments />} />
           <Route path="/history" element={<History />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/customers/create" element={<CreateCustomer />} />
+          <Route path="/staff" element={<Staff />} />
+          <Route path="/staff/create" element={<CreateStaff />} />
           <Route path="/vehicles" element={<Vehicles />} />
           <Route path="/vehicles/create" element={<CreateVehicle />} />
           <Route path="/reports" element={<Reports />} />

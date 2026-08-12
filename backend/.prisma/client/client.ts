@@ -52,6 +52,11 @@ export type vehicles = Prisma.vehiclesModel
  */
 export type user = Prisma.userModel
 /**
+ * Model staff
+ * 
+ */
+export type staff = Prisma.staffModel
+/**
  * Model orders
  * 
  */

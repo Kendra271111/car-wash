@@ -1,4 +1,4 @@
-import { api } from '../services/api'
+import { api } from '../api/api'
 
 export const statusColors = {
   PENDING: 'badge-warning',
@@ -51,8 +51,8 @@ export const updateOrder = async (id, orderData) => {
 }
 
 export const deleteOrder = async (id) => {
-  await api.delete(`/orders/${id}`)
-  return true
+  const res = await api.delete(`/orders/${id}`)
+  return res.data
 }
 
 export default {

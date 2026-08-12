@@ -29,29 +29,28 @@ export type AggregateOrder_items = {
 export type Order_itemsAvgAggregateOutputType = {
   id: number | null
   orderId: number | null
-  serviceId: number | null
   duration: number | null
   amount: number | null
   price: number | null
   qty: number | null
   subtotal: number | null
+  serviceId: number | null
 }
 
 export type Order_itemsSumAggregateOutputType = {
   id: number | null
   orderId: number | null
-  serviceId: number | null
   duration: number | null
   amount: number | null
   price: number | null
   qty: number | null
   subtotal: number | null
+  serviceId: number | null
 }
 
 export type Order_itemsMinAggregateOutputType = {
   id: number | null
   orderId: number | null
-  serviceId: number | null
   duration: number | null
   amount: number | null
   price: number | null
@@ -59,12 +58,12 @@ export type Order_itemsMinAggregateOutputType = {
   subtotal: number | null
   createdAt: Date | null
   updatedAt: Date | null
+  serviceId: number | null
 }
 
 export type Order_itemsMaxAggregateOutputType = {
   id: number | null
   orderId: number | null
-  serviceId: number | null
   duration: number | null
   amount: number | null
   price: number | null
@@ -72,12 +71,12 @@ export type Order_itemsMaxAggregateOutputType = {
   subtotal: number | null
   createdAt: Date | null
   updatedAt: Date | null
+  serviceId: number | null
 }
 
 export type Order_itemsCountAggregateOutputType = {
   id: number
   orderId: number
-  serviceId: number
   duration: number
   amount: number
   price: number
@@ -85,6 +84,7 @@ export type Order_itemsCountAggregateOutputType = {
   subtotal: number
   createdAt: number
   updatedAt: number
+  serviceId: number
   _all: number
 }
 
@@ -92,29 +92,28 @@ export type Order_itemsCountAggregateOutputType = {
 export type Order_itemsAvgAggregateInputType = {
   id?: true
   orderId?: true
-  serviceId?: true
   duration?: true
   amount?: true
   price?: true
   qty?: true
   subtotal?: true
+  serviceId?: true
 }
 
 export type Order_itemsSumAggregateInputType = {
   id?: true
   orderId?: true
-  serviceId?: true
   duration?: true
   amount?: true
   price?: true
   qty?: true
   subtotal?: true
+  serviceId?: true
 }
 
 export type Order_itemsMinAggregateInputType = {
   id?: true
   orderId?: true
-  serviceId?: true
   duration?: true
   amount?: true
   price?: true
@@ -122,12 +121,12 @@ export type Order_itemsMinAggregateInputType = {
   subtotal?: true
   createdAt?: true
   updatedAt?: true
+  serviceId?: true
 }
 
 export type Order_itemsMaxAggregateInputType = {
   id?: true
   orderId?: true
-  serviceId?: true
   duration?: true
   amount?: true
   price?: true
@@ -135,12 +134,12 @@ export type Order_itemsMaxAggregateInputType = {
   subtotal?: true
   createdAt?: true
   updatedAt?: true
+  serviceId?: true
 }
 
 export type Order_itemsCountAggregateInputType = {
   id?: true
   orderId?: true
-  serviceId?: true
   duration?: true
   amount?: true
   price?: true
@@ -148,6 +147,7 @@ export type Order_itemsCountAggregateInputType = {
   subtotal?: true
   createdAt?: true
   updatedAt?: true
+  serviceId?: true
   _all?: true
 }
 
@@ -240,7 +240,6 @@ export type order_itemsGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 export type Order_itemsGroupByOutputType = {
   id: number
   orderId: number
-  serviceId: number
   duration: number
   amount: number
   price: number
@@ -248,6 +247,7 @@ export type Order_itemsGroupByOutputType = {
   subtotal: number
   createdAt: Date
   updatedAt: Date
+  serviceId: number
   _count: Order_itemsCountAggregateOutputType | null
   _avg: Order_itemsAvgAggregateOutputType | null
   _sum: Order_itemsSumAggregateOutputType | null
@@ -276,7 +276,6 @@ export type order_itemsWhereInput = {
   NOT?: Prisma.order_itemsWhereInput | Prisma.order_itemsWhereInput[]
   id?: Prisma.IntFilter<"order_items"> | number
   orderId?: Prisma.IntFilter<"order_items"> | number
-  serviceId?: Prisma.IntFilter<"order_items"> | number
   duration?: Prisma.IntFilter<"order_items"> | number
   amount?: Prisma.FloatFilter<"order_items"> | number
   price?: Prisma.FloatFilter<"order_items"> | number
@@ -284,6 +283,7 @@ export type order_itemsWhereInput = {
   subtotal?: Prisma.FloatFilter<"order_items"> | number
   createdAt?: Prisma.DateTimeFilter<"order_items"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"order_items"> | Date | string
+  serviceId?: Prisma.IntFilter<"order_items"> | number
   order?: Prisma.XOR<Prisma.OrdersScalarRelationFilter, Prisma.ordersWhereInput>
   service?: Prisma.XOR<Prisma.ServicesScalarRelationFilter, Prisma.servicesWhereInput>
 }
@@ -291,7 +291,6 @@ export type order_itemsWhereInput = {
 export type order_itemsOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
-  serviceId?: Prisma.SortOrder
   duration?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -299,6 +298,7 @@ export type order_itemsOrderByWithRelationInput = {
   subtotal?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  serviceId?: Prisma.SortOrder
   order?: Prisma.ordersOrderByWithRelationInput
   service?: Prisma.servicesOrderByWithRelationInput
 }
@@ -309,7 +309,6 @@ export type order_itemsWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.order_itemsWhereInput[]
   NOT?: Prisma.order_itemsWhereInput | Prisma.order_itemsWhereInput[]
   orderId?: Prisma.IntFilter<"order_items"> | number
-  serviceId?: Prisma.IntFilter<"order_items"> | number
   duration?: Prisma.IntFilter<"order_items"> | number
   amount?: Prisma.FloatFilter<"order_items"> | number
   price?: Prisma.FloatFilter<"order_items"> | number
@@ -317,6 +316,7 @@ export type order_itemsWhereUniqueInput = Prisma.AtLeast<{
   subtotal?: Prisma.FloatFilter<"order_items"> | number
   createdAt?: Prisma.DateTimeFilter<"order_items"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"order_items"> | Date | string
+  serviceId?: Prisma.IntFilter<"order_items"> | number
   order?: Prisma.XOR<Prisma.OrdersScalarRelationFilter, Prisma.ordersWhereInput>
   service?: Prisma.XOR<Prisma.ServicesScalarRelationFilter, Prisma.servicesWhereInput>
 }, "id">
@@ -324,7 +324,6 @@ export type order_itemsWhereUniqueInput = Prisma.AtLeast<{
 export type order_itemsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
-  serviceId?: Prisma.SortOrder
   duration?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -332,6 +331,7 @@ export type order_itemsOrderByWithAggregationInput = {
   subtotal?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  serviceId?: Prisma.SortOrder
   _count?: Prisma.order_itemsCountOrderByAggregateInput
   _avg?: Prisma.order_itemsAvgOrderByAggregateInput
   _max?: Prisma.order_itemsMaxOrderByAggregateInput
@@ -345,7 +345,6 @@ export type order_itemsScalarWhereWithAggregatesInput = {
   NOT?: Prisma.order_itemsScalarWhereWithAggregatesInput | Prisma.order_itemsScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"order_items"> | number
   orderId?: Prisma.IntWithAggregatesFilter<"order_items"> | number
-  serviceId?: Prisma.IntWithAggregatesFilter<"order_items"> | number
   duration?: Prisma.IntWithAggregatesFilter<"order_items"> | number
   amount?: Prisma.FloatWithAggregatesFilter<"order_items"> | number
   price?: Prisma.FloatWithAggregatesFilter<"order_items"> | number
@@ -353,6 +352,7 @@ export type order_itemsScalarWhereWithAggregatesInput = {
   subtotal?: Prisma.FloatWithAggregatesFilter<"order_items"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"order_items"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"order_items"> | Date | string
+  serviceId?: Prisma.IntWithAggregatesFilter<"order_items"> | number
 }
 
 export type order_itemsCreateInput = {
@@ -370,7 +370,6 @@ export type order_itemsCreateInput = {
 export type order_itemsUncheckedCreateInput = {
   id?: number
   orderId: number
-  serviceId: number
   duration: number
   amount: number
   price: number
@@ -378,6 +377,7 @@ export type order_itemsUncheckedCreateInput = {
   subtotal: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  serviceId: number
 }
 
 export type order_itemsUpdateInput = {
@@ -395,7 +395,6 @@ export type order_itemsUpdateInput = {
 export type order_itemsUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   orderId?: Prisma.IntFieldUpdateOperationsInput | number
-  serviceId?: Prisma.IntFieldUpdateOperationsInput | number
   duration?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   price?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -403,12 +402,12 @@ export type order_itemsUncheckedUpdateInput = {
   subtotal?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  serviceId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type order_itemsCreateManyInput = {
   id?: number
   orderId: number
-  serviceId: number
   duration: number
   amount: number
   price: number
@@ -416,6 +415,7 @@ export type order_itemsCreateManyInput = {
   subtotal: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  serviceId: number
 }
 
 export type order_itemsUpdateManyMutationInput = {
@@ -431,7 +431,6 @@ export type order_itemsUpdateManyMutationInput = {
 export type order_itemsUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   orderId?: Prisma.IntFieldUpdateOperationsInput | number
-  serviceId?: Prisma.IntFieldUpdateOperationsInput | number
   duration?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   price?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -439,6 +438,7 @@ export type order_itemsUncheckedUpdateManyInput = {
   subtotal?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  serviceId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type Order_itemsListRelationFilter = {
@@ -454,7 +454,6 @@ export type order_itemsOrderByRelationAggregateInput = {
 export type order_itemsCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
-  serviceId?: Prisma.SortOrder
   duration?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -462,23 +461,23 @@ export type order_itemsCountOrderByAggregateInput = {
   subtotal?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  serviceId?: Prisma.SortOrder
 }
 
 export type order_itemsAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
-  serviceId?: Prisma.SortOrder
   duration?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   price?: Prisma.SortOrder
   qty?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
+  serviceId?: Prisma.SortOrder
 }
 
 export type order_itemsMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
-  serviceId?: Prisma.SortOrder
   duration?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -486,12 +485,12 @@ export type order_itemsMaxOrderByAggregateInput = {
   subtotal?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  serviceId?: Prisma.SortOrder
 }
 
 export type order_itemsMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
-  serviceId?: Prisma.SortOrder
   duration?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -499,17 +498,18 @@ export type order_itemsMinOrderByAggregateInput = {
   subtotal?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  serviceId?: Prisma.SortOrder
 }
 
 export type order_itemsSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orderId?: Prisma.SortOrder
-  serviceId?: Prisma.SortOrder
   duration?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   price?: Prisma.SortOrder
   qty?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
+  serviceId?: Prisma.SortOrder
 }
 
 export type order_itemsCreateNestedManyWithoutOrderInput = {
@@ -609,7 +609,6 @@ export type order_itemsCreateWithoutOrderInput = {
 
 export type order_itemsUncheckedCreateWithoutOrderInput = {
   id?: number
-  serviceId: number
   duration: number
   amount: number
   price: number
@@ -617,6 +616,7 @@ export type order_itemsUncheckedCreateWithoutOrderInput = {
   subtotal: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  serviceId: number
 }
 
 export type order_itemsCreateOrConnectWithoutOrderInput = {
@@ -651,7 +651,6 @@ export type order_itemsScalarWhereInput = {
   NOT?: Prisma.order_itemsScalarWhereInput | Prisma.order_itemsScalarWhereInput[]
   id?: Prisma.IntFilter<"order_items"> | number
   orderId?: Prisma.IntFilter<"order_items"> | number
-  serviceId?: Prisma.IntFilter<"order_items"> | number
   duration?: Prisma.IntFilter<"order_items"> | number
   amount?: Prisma.FloatFilter<"order_items"> | number
   price?: Prisma.FloatFilter<"order_items"> | number
@@ -659,6 +658,7 @@ export type order_itemsScalarWhereInput = {
   subtotal?: Prisma.FloatFilter<"order_items"> | number
   createdAt?: Prisma.DateTimeFilter<"order_items"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"order_items"> | Date | string
+  serviceId?: Prisma.IntFilter<"order_items"> | number
 }
 
 export type order_itemsCreateWithoutServiceInput = {
@@ -712,7 +712,6 @@ export type order_itemsUpdateManyWithWhereWithoutServiceInput = {
 
 export type order_itemsCreateManyOrderInput = {
   id?: number
-  serviceId: number
   duration: number
   amount: number
   price: number
@@ -720,6 +719,7 @@ export type order_itemsCreateManyOrderInput = {
   subtotal: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  serviceId: number
 }
 
 export type order_itemsUpdateWithoutOrderInput = {
@@ -735,7 +735,6 @@ export type order_itemsUpdateWithoutOrderInput = {
 
 export type order_itemsUncheckedUpdateWithoutOrderInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  serviceId?: Prisma.IntFieldUpdateOperationsInput | number
   duration?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   price?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -743,11 +742,11 @@ export type order_itemsUncheckedUpdateWithoutOrderInput = {
   subtotal?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  serviceId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type order_itemsUncheckedUpdateManyWithoutOrderInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  serviceId?: Prisma.IntFieldUpdateOperationsInput | number
   duration?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   price?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -755,6 +754,7 @@ export type order_itemsUncheckedUpdateManyWithoutOrderInput = {
   subtotal?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  serviceId?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type order_itemsCreateManyServiceInput = {
@@ -809,7 +809,6 @@ export type order_itemsUncheckedUpdateManyWithoutServiceInput = {
 export type order_itemsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   orderId?: boolean
-  serviceId?: boolean
   duration?: boolean
   amount?: boolean
   price?: boolean
@@ -817,6 +816,7 @@ export type order_itemsSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   subtotal?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  serviceId?: boolean
   order?: boolean | Prisma.ordersDefaultArgs<ExtArgs>
   service?: boolean | Prisma.servicesDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["order_items"]>
@@ -824,7 +824,6 @@ export type order_itemsSelect<ExtArgs extends runtime.Types.Extensions.InternalA
 export type order_itemsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   orderId?: boolean
-  serviceId?: boolean
   duration?: boolean
   amount?: boolean
   price?: boolean
@@ -832,6 +831,7 @@ export type order_itemsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   subtotal?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  serviceId?: boolean
   order?: boolean | Prisma.ordersDefaultArgs<ExtArgs>
   service?: boolean | Prisma.servicesDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["order_items"]>
@@ -839,7 +839,6 @@ export type order_itemsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
 export type order_itemsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   orderId?: boolean
-  serviceId?: boolean
   duration?: boolean
   amount?: boolean
   price?: boolean
@@ -847,6 +846,7 @@ export type order_itemsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   subtotal?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  serviceId?: boolean
   order?: boolean | Prisma.ordersDefaultArgs<ExtArgs>
   service?: boolean | Prisma.servicesDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["order_items"]>
@@ -854,7 +854,6 @@ export type order_itemsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
 export type order_itemsSelectScalar = {
   id?: boolean
   orderId?: boolean
-  serviceId?: boolean
   duration?: boolean
   amount?: boolean
   price?: boolean
@@ -862,9 +861,10 @@ export type order_itemsSelectScalar = {
   subtotal?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  serviceId?: boolean
 }
 
-export type order_itemsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "serviceId" | "duration" | "amount" | "price" | "qty" | "subtotal" | "createdAt" | "updatedAt", ExtArgs["result"]["order_items"]>
+export type order_itemsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "duration" | "amount" | "price" | "qty" | "subtotal" | "createdAt" | "updatedAt" | "serviceId", ExtArgs["result"]["order_items"]>
 export type order_itemsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order?: boolean | Prisma.ordersDefaultArgs<ExtArgs>
   service?: boolean | Prisma.servicesDefaultArgs<ExtArgs>
@@ -887,7 +887,6 @@ export type $order_itemsPayload<ExtArgs extends runtime.Types.Extensions.Interna
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     orderId: number
-    serviceId: number
     duration: number
     amount: number
     price: number
@@ -895,6 +894,7 @@ export type $order_itemsPayload<ExtArgs extends runtime.Types.Extensions.Interna
     subtotal: number
     createdAt: Date
     updatedAt: Date
+    serviceId: number
   }, ExtArgs["result"]["order_items"]>
   composites: {}
 }
@@ -1322,7 +1322,6 @@ export interface Prisma__order_itemsClient<T, Null = never, ExtArgs extends runt
 export interface order_itemsFieldRefs {
   readonly id: Prisma.FieldRef<"order_items", 'Int'>
   readonly orderId: Prisma.FieldRef<"order_items", 'Int'>
-  readonly serviceId: Prisma.FieldRef<"order_items", 'Int'>
   readonly duration: Prisma.FieldRef<"order_items", 'Int'>
   readonly amount: Prisma.FieldRef<"order_items", 'Float'>
   readonly price: Prisma.FieldRef<"order_items", 'Float'>
@@ -1330,6 +1329,7 @@ export interface order_itemsFieldRefs {
   readonly subtotal: Prisma.FieldRef<"order_items", 'Float'>
   readonly createdAt: Prisma.FieldRef<"order_items", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"order_items", 'DateTime'>
+  readonly serviceId: Prisma.FieldRef<"order_items", 'Int'>
 }
     
 

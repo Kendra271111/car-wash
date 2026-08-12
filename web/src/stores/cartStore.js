@@ -44,6 +44,8 @@ const useCartStore = create((set, get) => ({
 
   clearCart: () => set({ items: [] }),
 
+  setItems: (items) => set({ items }),
+
   totalAmount: () => (get().items || []).reduce((sum, i) => sum + i.subtotal, 0),
   totalItems: () => (get().items || []).reduce((sum, i) => sum + i.quantity, 0),
   totalDuration: () => (get().items || []).reduce((sum, i) => sum + (Number(i.duration) || 0) * i.quantity, 0),

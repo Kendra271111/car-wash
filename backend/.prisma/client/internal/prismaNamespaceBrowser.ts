@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   vehicles: 'vehicles',
   user: 'user',
+  staff: 'staff',
   orders: 'orders',
   customers: 'customers',
   payments: 'payments',
@@ -105,6 +106,21 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const StaffScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  phone: 'phone',
+  position: 'position',
+  isActive: 'isActive',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StaffScalarFieldEnum = (typeof StaffScalarFieldEnum)[keyof typeof StaffScalarFieldEnum]
+
+
 export const OrdersScalarFieldEnum = {
   id: 'id',
   vehicleId: 'vehicleId',
@@ -112,7 +128,8 @@ export const OrdersScalarFieldEnum = {
   staffId: 'staffId',
   status: 'status',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  note: 'note'
 } as const
 
 export type OrdersScalarFieldEnum = (typeof OrdersScalarFieldEnum)[keyof typeof OrdersScalarFieldEnum]
@@ -145,14 +162,14 @@ export type PaymentsScalarFieldEnum = (typeof PaymentsScalarFieldEnum)[keyof typ
 export const Order_itemsScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
-  serviceId: 'serviceId',
   duration: 'duration',
   amount: 'amount',
   price: 'price',
   qty: 'qty',
   subtotal: 'subtotal',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  serviceId: 'serviceId'
 } as const
 
 export type Order_itemsScalarFieldEnum = (typeof Order_itemsScalarFieldEnum)[keyof typeof Order_itemsScalarFieldEnum]

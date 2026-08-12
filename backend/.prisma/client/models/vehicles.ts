@@ -214,7 +214,7 @@ export type VehiclesGroupByOutputType = {
   brand: string
   model: string
   image: string | null
-  customerId: number
+  customerId: number | null
   createdAt: Date
   updatedAt: Date
   _count: VehiclesCountAggregateOutputType | null
@@ -249,10 +249,10 @@ export type vehiclesWhereInput = {
   brand?: Prisma.StringFilter<"vehicles"> | string
   model?: Prisma.StringFilter<"vehicles"> | string
   image?: Prisma.StringNullableFilter<"vehicles"> | string | null
-  customerId?: Prisma.IntFilter<"vehicles"> | number
+  customerId?: Prisma.IntNullableFilter<"vehicles"> | number | null
   createdAt?: Prisma.DateTimeFilter<"vehicles"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"vehicles"> | Date | string
-  customer?: Prisma.XOR<Prisma.CustomersScalarRelationFilter, Prisma.customersWhereInput>
+  customer?: Prisma.XOR<Prisma.CustomersNullableScalarRelationFilter, Prisma.customersWhereInput> | null
   orders?: Prisma.OrdersListRelationFilter
 }
 
@@ -263,7 +263,7 @@ export type vehiclesOrderByWithRelationInput = {
   brand?: Prisma.SortOrder
   model?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
-  customerId?: Prisma.SortOrder
+  customerId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   customer?: Prisma.customersOrderByWithRelationInput
@@ -280,10 +280,10 @@ export type vehiclesWhereUniqueInput = Prisma.AtLeast<{
   brand?: Prisma.StringFilter<"vehicles"> | string
   model?: Prisma.StringFilter<"vehicles"> | string
   image?: Prisma.StringNullableFilter<"vehicles"> | string | null
-  customerId?: Prisma.IntFilter<"vehicles"> | number
+  customerId?: Prisma.IntNullableFilter<"vehicles"> | number | null
   createdAt?: Prisma.DateTimeFilter<"vehicles"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"vehicles"> | Date | string
-  customer?: Prisma.XOR<Prisma.CustomersScalarRelationFilter, Prisma.customersWhereInput>
+  customer?: Prisma.XOR<Prisma.CustomersNullableScalarRelationFilter, Prisma.customersWhereInput> | null
   orders?: Prisma.OrdersListRelationFilter
 }, "id" | "plateNumber">
 
@@ -294,7 +294,7 @@ export type vehiclesOrderByWithAggregationInput = {
   brand?: Prisma.SortOrder
   model?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
-  customerId?: Prisma.SortOrder
+  customerId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.vehiclesCountOrderByAggregateInput
@@ -314,7 +314,7 @@ export type vehiclesScalarWhereWithAggregatesInput = {
   brand?: Prisma.StringWithAggregatesFilter<"vehicles"> | string
   model?: Prisma.StringWithAggregatesFilter<"vehicles"> | string
   image?: Prisma.StringNullableWithAggregatesFilter<"vehicles"> | string | null
-  customerId?: Prisma.IntWithAggregatesFilter<"vehicles"> | number
+  customerId?: Prisma.IntNullableWithAggregatesFilter<"vehicles"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"vehicles"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"vehicles"> | Date | string
 }
@@ -327,7 +327,7 @@ export type vehiclesCreateInput = {
   image?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  customer: Prisma.customersCreateNestedOneWithoutVehiclesInput
+  customer?: Prisma.customersCreateNestedOneWithoutVehiclesInput
   orders?: Prisma.ordersCreateNestedManyWithoutVehicleInput
 }
 
@@ -338,7 +338,7 @@ export type vehiclesUncheckedCreateInput = {
   brand: string
   model: string
   image?: string | null
-  customerId: number
+  customerId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   orders?: Prisma.ordersUncheckedCreateNestedManyWithoutVehicleInput
@@ -352,7 +352,7 @@ export type vehiclesUpdateInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  customer?: Prisma.customersUpdateOneRequiredWithoutVehiclesNestedInput
+  customer?: Prisma.customersUpdateOneWithoutVehiclesNestedInput
   orders?: Prisma.ordersUpdateManyWithoutVehicleNestedInput
 }
 
@@ -363,7 +363,7 @@ export type vehiclesUncheckedUpdateInput = {
   brand?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.StringFieldUpdateOperationsInput | string
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerId?: Prisma.IntFieldUpdateOperationsInput | number
+  customerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.ordersUncheckedUpdateManyWithoutVehicleNestedInput
@@ -376,7 +376,7 @@ export type vehiclesCreateManyInput = {
   brand: string
   model: string
   image?: string | null
-  customerId: number
+  customerId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -398,7 +398,7 @@ export type vehiclesUncheckedUpdateManyInput = {
   brand?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.StringFieldUpdateOperationsInput | string
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerId?: Prisma.IntFieldUpdateOperationsInput | number
+  customerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -484,6 +484,14 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type vehiclesCreateNestedOneWithoutOrdersInput = {
   create?: Prisma.XOR<Prisma.vehiclesCreateWithoutOrdersInput, Prisma.vehiclesUncheckedCreateWithoutOrdersInput>
   connectOrCreate?: Prisma.vehiclesCreateOrConnectWithoutOrdersInput
@@ -548,7 +556,7 @@ export type vehiclesCreateWithoutOrdersInput = {
   image?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  customer: Prisma.customersCreateNestedOneWithoutVehiclesInput
+  customer?: Prisma.customersCreateNestedOneWithoutVehiclesInput
 }
 
 export type vehiclesUncheckedCreateWithoutOrdersInput = {
@@ -558,7 +566,7 @@ export type vehiclesUncheckedCreateWithoutOrdersInput = {
   brand: string
   model: string
   image?: string | null
-  customerId: number
+  customerId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -587,7 +595,7 @@ export type vehiclesUpdateWithoutOrdersInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  customer?: Prisma.customersUpdateOneRequiredWithoutVehiclesNestedInput
+  customer?: Prisma.customersUpdateOneWithoutVehiclesNestedInput
 }
 
 export type vehiclesUncheckedUpdateWithoutOrdersInput = {
@@ -597,7 +605,7 @@ export type vehiclesUncheckedUpdateWithoutOrdersInput = {
   brand?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.StringFieldUpdateOperationsInput | string
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  customerId?: Prisma.IntFieldUpdateOperationsInput | number
+  customerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -661,7 +669,7 @@ export type vehiclesScalarWhereInput = {
   brand?: Prisma.StringFilter<"vehicles"> | string
   model?: Prisma.StringFilter<"vehicles"> | string
   image?: Prisma.StringNullableFilter<"vehicles"> | string | null
-  customerId?: Prisma.IntFilter<"vehicles"> | number
+  customerId?: Prisma.IntNullableFilter<"vehicles"> | number | null
   createdAt?: Prisma.DateTimeFilter<"vehicles"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"vehicles"> | Date | string
 }
@@ -752,7 +760,7 @@ export type vehiclesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   customerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  customer?: boolean | Prisma.customersDefaultArgs<ExtArgs>
+  customer?: boolean | Prisma.vehicles$customerArgs<ExtArgs>
   orders?: boolean | Prisma.vehicles$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.VehiclesCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vehicles"]>
@@ -767,7 +775,7 @@ export type vehiclesSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   customerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  customer?: boolean | Prisma.customersDefaultArgs<ExtArgs>
+  customer?: boolean | Prisma.vehicles$customerArgs<ExtArgs>
 }, ExtArgs["result"]["vehicles"]>
 
 export type vehiclesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -780,7 +788,7 @@ export type vehiclesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   customerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  customer?: boolean | Prisma.customersDefaultArgs<ExtArgs>
+  customer?: boolean | Prisma.vehicles$customerArgs<ExtArgs>
 }, ExtArgs["result"]["vehicles"]>
 
 export type vehiclesSelectScalar = {
@@ -797,21 +805,21 @@ export type vehiclesSelectScalar = {
 
 export type vehiclesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "plateNumber" | "brand" | "model" | "image" | "customerId" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicles"]>
 export type vehiclesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  customer?: boolean | Prisma.customersDefaultArgs<ExtArgs>
+  customer?: boolean | Prisma.vehicles$customerArgs<ExtArgs>
   orders?: boolean | Prisma.vehicles$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.VehiclesCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type vehiclesIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  customer?: boolean | Prisma.customersDefaultArgs<ExtArgs>
+  customer?: boolean | Prisma.vehicles$customerArgs<ExtArgs>
 }
 export type vehiclesIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  customer?: boolean | Prisma.customersDefaultArgs<ExtArgs>
+  customer?: boolean | Prisma.vehicles$customerArgs<ExtArgs>
 }
 
 export type $vehiclesPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "vehicles"
   objects: {
-    customer: Prisma.$customersPayload<ExtArgs>
+    customer: Prisma.$customersPayload<ExtArgs> | null
     orders: Prisma.$ordersPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -821,7 +829,7 @@ export type $vehiclesPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     brand: string
     model: string
     image: string | null
-    customerId: number
+    customerId: number | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["vehicles"]>
@@ -1218,7 +1226,7 @@ readonly fields: vehiclesFieldRefs;
  */
 export interface Prisma__vehiclesClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  customer<T extends Prisma.customersDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.customersDefaultArgs<ExtArgs>>): Prisma.Prisma__customersClient<runtime.Types.Result.GetResult<Prisma.$customersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  customer<T extends Prisma.vehicles$customerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.vehicles$customerArgs<ExtArgs>>): Prisma.Prisma__customersClient<runtime.Types.Result.GetResult<Prisma.$customersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   orders<T extends Prisma.vehicles$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.vehicles$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ordersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1656,6 +1664,25 @@ export type vehiclesDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Limit how many vehicles to delete.
    */
   limit?: number
+}
+
+/**
+ * vehicles.customer
+ */
+export type vehicles$customerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the customers
+   */
+  select?: Prisma.customersSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the customers
+   */
+  omit?: Prisma.customersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.customersInclude<ExtArgs> | null
+  where?: Prisma.customersWhereInput
 }
 
 /**

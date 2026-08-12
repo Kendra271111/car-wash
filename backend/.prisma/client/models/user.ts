@@ -240,7 +240,7 @@ export type userWhereInput = {
   role?: Prisma.StringFilter<"user"> | string
   createdAt?: Prisma.DateTimeFilter<"user"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"user"> | Date | string
-  orders?: Prisma.OrdersListRelationFilter
+  staff?: Prisma.XOR<Prisma.StaffNullableScalarRelationFilter, Prisma.staffWhereInput> | null
 }
 
 export type userOrderByWithRelationInput = {
@@ -252,7 +252,7 @@ export type userOrderByWithRelationInput = {
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  orders?: Prisma.ordersOrderByRelationAggregateInput
+  staff?: Prisma.staffOrderByWithRelationInput
 }
 
 export type userWhereUniqueInput = Prisma.AtLeast<{
@@ -267,7 +267,7 @@ export type userWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.StringFilter<"user"> | string
   createdAt?: Prisma.DateTimeFilter<"user"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"user"> | Date | string
-  orders?: Prisma.OrdersListRelationFilter
+  staff?: Prisma.XOR<Prisma.StaffNullableScalarRelationFilter, Prisma.staffWhereInput> | null
 }, "id" | "email">
 
 export type userOrderByWithAggregationInput = {
@@ -308,7 +308,7 @@ export type userCreateInput = {
   role?: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  orders?: Prisma.ordersCreateNestedManyWithoutStaffInput
+  staff?: Prisma.staffCreateNestedOneWithoutUserInput
 }
 
 export type userUncheckedCreateInput = {
@@ -320,7 +320,7 @@ export type userUncheckedCreateInput = {
   role?: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  orders?: Prisma.ordersUncheckedCreateNestedManyWithoutStaffInput
+  staff?: Prisma.staffUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type userUpdateInput = {
@@ -331,7 +331,7 @@ export type userUpdateInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orders?: Prisma.ordersUpdateManyWithoutStaffNestedInput
+  staff?: Prisma.staffUpdateOneWithoutUserNestedInput
 }
 
 export type userUncheckedUpdateInput = {
@@ -343,7 +343,7 @@ export type userUncheckedUpdateInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orders?: Prisma.ordersUncheckedUpdateManyWithoutStaffNestedInput
+  staff?: Prisma.staffUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type userCreateManyInput = {
@@ -419,26 +419,28 @@ export type userSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
-export type UserScalarRelationFilter = {
-  is?: Prisma.userWhereInput
-  isNot?: Prisma.userWhereInput
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.userWhereInput | null
+  isNot?: Prisma.userWhereInput | null
 }
 
-export type userCreateNestedOneWithoutOrdersInput = {
-  create?: Prisma.XOR<Prisma.userCreateWithoutOrdersInput, Prisma.userUncheckedCreateWithoutOrdersInput>
-  connectOrCreate?: Prisma.userCreateOrConnectWithoutOrdersInput
+export type userCreateNestedOneWithoutStaffInput = {
+  create?: Prisma.XOR<Prisma.userCreateWithoutStaffInput, Prisma.userUncheckedCreateWithoutStaffInput>
+  connectOrCreate?: Prisma.userCreateOrConnectWithoutStaffInput
   connect?: Prisma.userWhereUniqueInput
 }
 
-export type userUpdateOneRequiredWithoutOrdersNestedInput = {
-  create?: Prisma.XOR<Prisma.userCreateWithoutOrdersInput, Prisma.userUncheckedCreateWithoutOrdersInput>
-  connectOrCreate?: Prisma.userCreateOrConnectWithoutOrdersInput
-  upsert?: Prisma.userUpsertWithoutOrdersInput
+export type userUpdateOneWithoutStaffNestedInput = {
+  create?: Prisma.XOR<Prisma.userCreateWithoutStaffInput, Prisma.userUncheckedCreateWithoutStaffInput>
+  connectOrCreate?: Prisma.userCreateOrConnectWithoutStaffInput
+  upsert?: Prisma.userUpsertWithoutStaffInput
+  disconnect?: Prisma.userWhereInput | boolean
+  delete?: Prisma.userWhereInput | boolean
   connect?: Prisma.userWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.userUpdateToOneWithWhereWithoutOrdersInput, Prisma.userUpdateWithoutOrdersInput>, Prisma.userUncheckedUpdateWithoutOrdersInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.userUpdateToOneWithWhereWithoutStaffInput, Prisma.userUpdateWithoutStaffInput>, Prisma.userUncheckedUpdateWithoutStaffInput>
 }
 
-export type userCreateWithoutOrdersInput = {
+export type userCreateWithoutStaffInput = {
   name: string
   email: string
   password: string
@@ -448,7 +450,7 @@ export type userCreateWithoutOrdersInput = {
   updatedAt?: Date | string
 }
 
-export type userUncheckedCreateWithoutOrdersInput = {
+export type userUncheckedCreateWithoutStaffInput = {
   id?: number
   name: string
   email: string
@@ -459,23 +461,23 @@ export type userUncheckedCreateWithoutOrdersInput = {
   updatedAt?: Date | string
 }
 
-export type userCreateOrConnectWithoutOrdersInput = {
+export type userCreateOrConnectWithoutStaffInput = {
   where: Prisma.userWhereUniqueInput
-  create: Prisma.XOR<Prisma.userCreateWithoutOrdersInput, Prisma.userUncheckedCreateWithoutOrdersInput>
+  create: Prisma.XOR<Prisma.userCreateWithoutStaffInput, Prisma.userUncheckedCreateWithoutStaffInput>
 }
 
-export type userUpsertWithoutOrdersInput = {
-  update: Prisma.XOR<Prisma.userUpdateWithoutOrdersInput, Prisma.userUncheckedUpdateWithoutOrdersInput>
-  create: Prisma.XOR<Prisma.userCreateWithoutOrdersInput, Prisma.userUncheckedCreateWithoutOrdersInput>
+export type userUpsertWithoutStaffInput = {
+  update: Prisma.XOR<Prisma.userUpdateWithoutStaffInput, Prisma.userUncheckedUpdateWithoutStaffInput>
+  create: Prisma.XOR<Prisma.userCreateWithoutStaffInput, Prisma.userUncheckedCreateWithoutStaffInput>
   where?: Prisma.userWhereInput
 }
 
-export type userUpdateToOneWithWhereWithoutOrdersInput = {
+export type userUpdateToOneWithWhereWithoutStaffInput = {
   where?: Prisma.userWhereInput
-  data: Prisma.XOR<Prisma.userUpdateWithoutOrdersInput, Prisma.userUncheckedUpdateWithoutOrdersInput>
+  data: Prisma.XOR<Prisma.userUpdateWithoutStaffInput, Prisma.userUncheckedUpdateWithoutStaffInput>
 }
 
-export type userUpdateWithoutOrdersInput = {
+export type userUpdateWithoutStaffInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
@@ -485,7 +487,7 @@ export type userUpdateWithoutOrdersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type userUncheckedUpdateWithoutOrdersInput = {
+export type userUncheckedUpdateWithoutStaffInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
@@ -497,35 +499,6 @@ export type userUncheckedUpdateWithoutOrdersInput = {
 }
 
 
-/**
- * Count Type UserCountOutputType
- */
-
-export type UserCountOutputType = {
-  orders: number
-}
-
-export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  orders?: boolean | UserCountOutputTypeCountOrdersArgs
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the UserCountOutputType
-   */
-  select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ordersWhereInput
-}
-
 
 export type userSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -536,8 +509,7 @@ export type userSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   role?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  orders?: boolean | Prisma.user$ordersArgs<ExtArgs>
-  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
+  staff?: boolean | Prisma.user$staffArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type userSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -575,8 +547,7 @@ export type userSelectScalar = {
 
 export type userOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "pfp" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type userInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  orders?: boolean | Prisma.user$ordersArgs<ExtArgs>
-  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
+  staff?: boolean | Prisma.user$staffArgs<ExtArgs>
 }
 export type userIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 export type userIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -584,7 +555,7 @@ export type userIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $userPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "user"
   objects: {
-    orders: Prisma.$ordersPayload<ExtArgs>[]
+    staff: Prisma.$staffPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -989,7 +960,7 @@ readonly fields: userFieldRefs;
  */
 export interface Prisma__userClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  orders<T extends Prisma.user$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.user$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ordersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  staff<T extends Prisma.user$staffArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.user$staffArgs<ExtArgs>>): Prisma.Prisma__staffClient<runtime.Types.Result.GetResult<Prisma.$staffPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1420,27 +1391,22 @@ export type userDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * user.orders
+ * user.staff
  */
-export type user$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type user$staffArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the orders
+   * Select specific fields to fetch from the staff
    */
-  select?: Prisma.ordersSelect<ExtArgs> | null
+  select?: Prisma.staffSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the orders
+   * Omit specific fields from the staff
    */
-  omit?: Prisma.ordersOmit<ExtArgs> | null
+  omit?: Prisma.staffOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ordersInclude<ExtArgs> | null
-  where?: Prisma.ordersWhereInput
-  orderBy?: Prisma.ordersOrderByWithRelationInput | Prisma.ordersOrderByWithRelationInput[]
-  cursor?: Prisma.ordersWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.OrdersScalarFieldEnum | Prisma.OrdersScalarFieldEnum[]
+  include?: Prisma.staffInclude<ExtArgs> | null
+  where?: Prisma.staffWhereInput
 }
 
 /**

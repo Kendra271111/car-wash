@@ -6,6 +6,7 @@ const navItems = [
   { href: '/dashboard', label: 'Home', icon: 'home' },
   { href: '/orders', label: 'Orders', icon: 'local_car_wash' },
   { href: '/customers', label: 'Customers', icon: 'people' },
+  { href: '/staff', label: 'Staff', icon: 'badge' },
   { href: '/vehicles', label: 'Vehicles', icon: 'directions_car' },
   { href: '/services', label: 'Services', icon: 'handyman' },
   { href: '/history', label: 'Order History', icon: 'restore' },

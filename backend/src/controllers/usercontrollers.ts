@@ -9,7 +9,7 @@ export const helloWorld = (req: Request, res: Response, next: NextFunction) => {
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { name, email, password, point } = req.body;
+        const { name, email, password, point, role } = req.body;
         const pfp = req.file ? req.file.filename : null;
         const newUser = await prisma.user.create({
             data: {
@@ -18,6 +18,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
                 password: password, 
                 point: Number(point),
                 pfp,
+                role: role || 'USER',
             },
         });
     
@@ -31,46 +32,46 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 };
 
 export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const {search, minPrice, sortBy} = req.query;
-        const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || 10;
-        const skip = (page - 1) * limit
-        const users = await prisma.user.findMany({
-            where: {
-                name: {
-                    contains: search as string,
-                    mode: 'insensitive'
-                }
-            },
-            take: limit,
-            skip: skip,
-            orderBy: {
-                createdAt: sortBy === 'oldest' ? 'asc' : 'desc'
-            },
-        });
+  try {
+    const {search, minPrice, sortBy} = req.query;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit
+    const users = await prisma.user.findMany({
+      where: {
+        name: {
+          contains: search as string,
+          mode: 'insensitive'
+        }
+      },
+      take: limit,
+      skip: skip,
+      orderBy: {
+        createdAt: sortBy === 'oldest' ? 'asc' : 'desc'
+      },
+    });
 
-        if (!users){
-            return res.status(404).json({
-                message: 'No such user found',
-            });
-        }       
+    if (!users){
+      return res.status(404).json({
+        message: 'No such user found',
+      });
+    }       
 
-        const total_data = await prisma.user.count();
+    const total_data = await prisma.user.count();
 
-        return res.status(200).json({
-            message: 'Users retrieved successfully',
-            meta: {
-                current_page: page,
-                limit: limit,
-                total_data: total_data,
-                total_pages: Math.ceil(total_data / limit)
-            },
-            data: users,
-        });
-    } catch (error) {
-         next(error);
-    }
+    return res.status(200).json({
+      message: 'Users retrieved successfully',
+      meta: {
+        current_page: page,
+        limit: limit,
+        total_data: total_data,
+        total_pages: Math.ceil(total_data / limit)
+      },
+      data: users,
+    });
+  } catch (error) {
+       next(error);
+  }
 };
 
 export const getUserById = async (req: Request, res: Response, next: NextFunction) => {

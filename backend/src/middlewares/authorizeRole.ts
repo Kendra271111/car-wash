@@ -10,7 +10,7 @@ export const authorizeRole = (allowedRoles: String[]) => {
             }
 
             if (!allowedRoles.includes(user.role)) {
-                return res.status(401).json({
+                return res.status(403).json({
                     message: `Access denied! This feature is only reserved for ${allowedRoles.join(", ")}`
                 });
             }

@@ -1,4 +1,4 @@
-import { api, clearAuth } from '../services/api'
+import { api, clearAuth } from '../api/api'
 
 export const login = async (email, password) => {
   const res = await api.post('/auth/login', { email, password })

@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../.prisma/client"
@@ -13,17 +8,17 @@ datasource db {
 }
 
 model vehicles {
-  id         Int        @id @default(autoincrement())
-  name       String
-  plateNumber String    @unique
-  brand      String
-  model      String
-  image      String?
-  customerId Int
-  customer   customers  @relation(fields: [customerId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt @default(now())
-  orders     orders[]
+  id          Int        @id @default(autoincrement())
+  name        String
+  plateNumber String     @unique
+  brand       String
+  model       String
+  image       String?
+  customerId  Int?
+  customer    customers? @relation(fields: [customerId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @default(now()) @updatedAt
+  orders      orders[]
 }
 
 model user {
@@ -34,23 +29,38 @@ model user {
   pfp       String?
   role      String   @default("USER")
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  staff     staff?
+}
+
+model staff {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  phone     String?
+  position  String?
+  isActive  Boolean  @default(true)
+  userId    Int?    @unique
+  user      user?     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
   orders    orders[]
 }
 
 model orders {
-  id         Int        @id @default(autoincrement())
-  vehicleId  Int
-  vehicle    vehicles   @relation(fields: [vehicleId], references: [id])
-  customerId Int
-  customer   customers  @relation(fields: [customerId], references: [id])
-  staffId    Int
-  staff      user       @relation(fields: [staffId], references: [id])
-  status     String     @default("PENDING")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt @default(now())
-  payements  payments[]
+  id          Int           @id @default(autoincrement())
+  vehicleId   Int
+  customerId  Int
+  staffId     Int
+  status      String        @default("PENDING")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now()) @updatedAt
+  note        String?
   order_items order_items[]
+  customer    customers     @relation(fields: [customerId], references: [id])
+  vehicle     vehicles      @relation(fields: [vehicleId], references: [id])
+  staff       staff         @relation(fields: [staffId], references: [id])
+  payements   payments[]
 }
 
 model customers {
@@ -59,44 +69,43 @@ model customers {
   email     String     @unique
   phone     Int
   createdAt DateTime   @default(now())
-  vehicles  vehicles[]
   orders    orders[]
+  vehicles  vehicles[]
 }
 
 model payments {
   id        Int      @id @default(autoincrement())
   orderId   Int
-  order     orders   @relation(fields: [orderId], references: [id])
   amount    Float
   method    String
   status    String   @default("PENDING")
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  order     orders   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model order_items {
   id        Int      @id @default(autoincrement())
   orderId   Int
-  order     orders   @relation(fields: [orderId], references: [id])
-  serviceId Int
-  service   services @relation(fields: [serviceId], references: [id])
   duration  Int
   amount    Float
   price     Float
   qty       Int
   subtotal  Float
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  serviceId Int
+  order     orders   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  service   services @relation(fields: [serviceId], references: [id])
 }
 
 model services {
-  id        Int      @id @default(autoincrement())
-  name      String
-  duration  Float
-  price     Float
-  qty       Int @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
-
+  id          Int           @id @default(autoincrement())
+  name        String
+  duration    Float
+  price       Float
+  qty         Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now()) @updatedAt
   order_items order_items[]
 }

@@ -35,9 +35,9 @@ const Orders = () => {
   const filtered = filter === 'all' ? orders : orders.filter((o) => (o.status || 'PENDING') === filter)
 
   const statCards = [
-    { label: 'Waiting', value: stats.PENDING, desc: 'Orders waiting to be processed' },
-    { label: 'In Progress', value: stats.PROCESSING, desc: 'Orders currently being processed' },
-    { label: 'Completed', value: stats.COMPLETED, desc: 'Completed orders' },
+    { label: 'Waiting', value: stats.PENDING, desc: 'orders waiting to be processed' },
+    { label: 'In Progress', value: stats.PROCESSING, desc: 'orders currently being processed' },
+    { label: 'Completed', value: stats.COMPLETED, desc: 'completed orders' },
     { label: 'Cancelled', value: stats.CANCELLED, desc: 'Cancelled orders' },
   ]
 
@@ -107,7 +107,7 @@ const Orders = () => {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>#</th>
+                    <th></th>
                     <th>Vehicle</th>
                     <th>Customer</th>
                     <th>Staff</th>

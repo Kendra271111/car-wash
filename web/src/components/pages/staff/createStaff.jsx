@@ -1,17 +1,17 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
-import vehicleController from '../../../controllers/vehicleController.js'
+import staffController from '../../../controllers/staffController.js'
 
-const CreateVehicle = () => {
+const CreateStaff = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
 
   const [form, setForm] = useState({
     name: '',
-    plateNumber: '',
-    brand: '',
-    model: '',
+    email: '',
+    phone: '',
+    position: '',
   })
 
   const updateField = (field, value) => {
@@ -23,17 +23,17 @@ const CreateVehicle = () => {
     setLoading(true)
     setError(null)
     try {
-      await vehicleController.createVehicle({
+      await staffController.createStaff({
         name: form.name,
-        plateNumber: form.plateNumber,
-        brand: form.brand,
-        model: form.model,
+        email: form.email,
+        phone: form.phone,
+        position: form.position,
       })
       setSuccess(true)
-      setForm({ name: '', plateNumber: '', brand: '', model: '' })
+      setForm({ name: '', email: '', phone: '', position: '' })
       setTimeout(() => setSuccess(false), 3000)
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create vehicle.')
+      setError(err.response?.data?.message || 'Failed to create staff.')
     } finally {
       setLoading(false)
     }
@@ -43,19 +43,19 @@ const CreateVehicle = () => {
     <div className="flex flex-col gap-4">
       <div className="flex flex-row justify-between items-center">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Create Vehicle</h1>
-          <p className="text-gray-600 dark:text-gray-300">Add a new vehicle to the system.</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Add Staff</h1>
+          <p className="text-gray-600 dark:text-gray-300">Create a new staff account.</p>
         </div>
-        <Link to="/vehicles" className="btn btn-ghost">
+        <Link to="/staff" className="btn btn-ghost">
           <span className="material-symbols-outlined mr-1">arrow_back</span>
-          Back to Vehicles
+          Back to Staff
         </Link>
       </div>
 
       {success && (
         <div className="alert alert-success">
           <span className="material-symbols-outlined">check_circle</span>
-          <span>Vehicle created successfully!</span>
+          <span>Staff created successfully!</span>
         </div>
       )}
 
@@ -70,55 +70,53 @@ const CreateVehicle = () => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className='w-full flex flex-row gap-5'>
             <div className='w-full'>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vehicle Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
-                placeholder="Enter vehicle name"
+                placeholder="Enter staff name"
                 value={form.name}
                 onChange={(e) => updateField('name', e.target.value)}
                 required
               />
             </div>
             <div className='w-full'>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Plate Number</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
               <input
-                type="text"
+                type="email"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
-                placeholder="Enter plate number"
-                value={form.plateNumber}
-                onChange={(e) => updateField('plateNumber', e.target.value)}
+                placeholder="Enter email"
+                value={form.email}
+                onChange={(e) => updateField('email', e.target.value)}
                 required
               />
             </div>
           </div>
           <div className='w-full flex flex-row gap-5'>
             <div className='w-full'>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Brand</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
-                placeholder="Enter brand"
-                value={form.brand}
-                onChange={(e) => updateField('brand', e.target.value)}
-                required
+                placeholder="Enter phone number"
+                value={form.phone}
+                onChange={(e) => updateField('phone', e.target.value)}
               />
             </div>
             <div className='w-full'>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Model</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position</label>
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
-                placeholder="Enter model"
-                value={form.model}
-                onChange={(e) => updateField('model', e.target.value)}
-                required
+                placeholder="Enter position"
+                value={form.position}
+                onChange={(e) => updateField('position', e.target.value)}
               />
             </div>
           </div>
           <div className="flex justify-end">
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Creating...' : 'Create Vehicle'}
+              {loading ? 'Creating...' : 'Create Staff'}
             </button>
           </div>
         </form>
@@ -127,4 +125,4 @@ const CreateVehicle = () => {
   )
 }
 
-export default CreateVehicle
+export default CreateStaff

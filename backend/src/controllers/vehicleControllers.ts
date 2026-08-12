@@ -11,7 +11,7 @@ export const createVehicle = async (req: Request, res: Response, next: NextFunct
         plateNumber: plateNumber as string,
         brand: brand as string,
         model: model as string,
-        customerId: Number(customerId),
+        customerId: customerId ? Number(customerId) : undefined,
       },
       include: {
         customer: true,
@@ -111,7 +111,7 @@ export const updateVehicle = async (req: Request, res: Response, next: NextFunct
         plateNumber: plateNumber as string,
         brand: brand as string,
         model: model as string,
-        customerId: Number(customerId),
+        customerId: customerId ? Number(customerId) : undefined,
       },
       include: {
         customer: true,

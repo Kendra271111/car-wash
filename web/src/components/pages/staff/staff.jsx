@@ -1,27 +1,27 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
-import customerController from '../../../controllers/customerController.js'
+import staffController from '../../../controllers/staffController.js'
 
-const Customers = () => {
-  const [customers, setCustomers] = useState([])
+const Staff = () => {
+  const [staff, setStaff] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
     let cancelled = false
-    const loadCustomers = async () => {
+    const loadStaff = async () => {
       setLoading(true)
       setError(null)
       try {
-        const data = await customerController.fetchCustomers()
-        if (!cancelled) setCustomers(data)
+        const data = await staffController.getStaff()
+        if (!cancelled) setStaff(data)
       } catch (err) {
-        if (!cancelled) setError(err.response?.data?.message || 'Failed to load customers.')
+        if (!cancelled) setError(err.response?.data?.message || 'Failed to load staff.')
       } finally {
         if (!cancelled) setLoading(false)
       }
     }
-    loadCustomers()
+    loadStaff()
     return () => { cancelled = true }
   }, [])
 
@@ -29,8 +29,8 @@ const Customers = () => {
     <div>
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between items-center">
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Customers</h1>
-          <Link to="/customers/create" className="btn btn-primary">Add Customer</Link>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Staff</h1>
+          <Link to="/staff/create" className="btn btn-primary">Add Staff</Link>
         </div>
 
         {error && (
@@ -46,27 +46,35 @@ const Customers = () => {
               <div className="p-8 text-center">
                 <span className="loading loading-spinner loading-lg text-indigo-600"></span>
               </div>
-            ) : customers.length === 0 ? (
+            ) : staff.length === 0 ? (
               <div className="p-8 text-center">
-                <p className="text-gray-500 dark:text-gray-400">No customers found.</p>
+                <p className="text-gray-500 dark:text-gray-400">No staff found.</p>
               </div>
             ) : (
               <table className="table">
                 <thead>
                   <tr>
-                    <th></th>
+                    <th>#</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
+                    <th>Position</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {customers.map((customer) => (
-                    <tr key={customer.id}>
-                      <td>{customer.id}</td>
-                      <td>{customer.name}</td>
-                      <td>{customer.email}</td>
-                      <td>{customer.phone}</td>
+                  {staff.map((member) => (
+                    <tr key={member.id}>
+                      <td>{member.id}</td>
+                      <td>{member.name}</td>
+                      <td>{member.email}</td>
+                      <td>{member.phone || '-'}</td>
+                      <td>{member.position || '-'}</td>
+                      <td>
+                        <span className={`badge ${member.isActive ? 'badge-success' : 'badge-error'}`}>
+                          {member.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -79,4 +87,4 @@ const Customers = () => {
   )
 }
 
-export default Customers
+export default Staff

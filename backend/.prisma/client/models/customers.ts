@@ -220,8 +220,8 @@ export type customersWhereInput = {
   email?: Prisma.StringFilter<"customers"> | string
   phone?: Prisma.IntFilter<"customers"> | number
   createdAt?: Prisma.DateTimeFilter<"customers"> | Date | string
-  vehicles?: Prisma.VehiclesListRelationFilter
   orders?: Prisma.OrdersListRelationFilter
+  vehicles?: Prisma.VehiclesListRelationFilter
 }
 
 export type customersOrderByWithRelationInput = {
@@ -230,8 +230,8 @@ export type customersOrderByWithRelationInput = {
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  vehicles?: Prisma.vehiclesOrderByRelationAggregateInput
   orders?: Prisma.ordersOrderByRelationAggregateInput
+  vehicles?: Prisma.vehiclesOrderByRelationAggregateInput
 }
 
 export type customersWhereUniqueInput = Prisma.AtLeast<{
@@ -243,8 +243,8 @@ export type customersWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"customers"> | string
   phone?: Prisma.IntFilter<"customers"> | number
   createdAt?: Prisma.DateTimeFilter<"customers"> | Date | string
-  vehicles?: Prisma.VehiclesListRelationFilter
   orders?: Prisma.OrdersListRelationFilter
+  vehicles?: Prisma.VehiclesListRelationFilter
 }, "id" | "email">
 
 export type customersOrderByWithAggregationInput = {
@@ -276,8 +276,8 @@ export type customersCreateInput = {
   email: string
   phone: number
   createdAt?: Date | string
-  vehicles?: Prisma.vehiclesCreateNestedManyWithoutCustomerInput
   orders?: Prisma.ordersCreateNestedManyWithoutCustomerInput
+  vehicles?: Prisma.vehiclesCreateNestedManyWithoutCustomerInput
 }
 
 export type customersUncheckedCreateInput = {
@@ -286,8 +286,8 @@ export type customersUncheckedCreateInput = {
   email: string
   phone: number
   createdAt?: Date | string
-  vehicles?: Prisma.vehiclesUncheckedCreateNestedManyWithoutCustomerInput
   orders?: Prisma.ordersUncheckedCreateNestedManyWithoutCustomerInput
+  vehicles?: Prisma.vehiclesUncheckedCreateNestedManyWithoutCustomerInput
 }
 
 export type customersUpdateInput = {
@@ -295,8 +295,8 @@ export type customersUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vehicles?: Prisma.vehiclesUpdateManyWithoutCustomerNestedInput
   orders?: Prisma.ordersUpdateManyWithoutCustomerNestedInput
+  vehicles?: Prisma.vehiclesUpdateManyWithoutCustomerNestedInput
 }
 
 export type customersUncheckedUpdateInput = {
@@ -305,8 +305,8 @@ export type customersUncheckedUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  vehicles?: Prisma.vehiclesUncheckedUpdateManyWithoutCustomerNestedInput
   orders?: Prisma.ordersUncheckedUpdateManyWithoutCustomerNestedInput
+  vehicles?: Prisma.vehiclesUncheckedUpdateManyWithoutCustomerNestedInput
 }
 
 export type customersCreateManyInput = {
@@ -330,6 +330,11 @@ export type customersUncheckedUpdateManyInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type CustomersNullableScalarRelationFilter = {
+  is?: Prisma.customersWhereInput | null
+  isNot?: Prisma.customersWhereInput | null
 }
 
 export type CustomersScalarRelationFilter = {
@@ -377,10 +382,12 @@ export type customersCreateNestedOneWithoutVehiclesInput = {
   connect?: Prisma.customersWhereUniqueInput
 }
 
-export type customersUpdateOneRequiredWithoutVehiclesNestedInput = {
+export type customersUpdateOneWithoutVehiclesNestedInput = {
   create?: Prisma.XOR<Prisma.customersCreateWithoutVehiclesInput, Prisma.customersUncheckedCreateWithoutVehiclesInput>
   connectOrCreate?: Prisma.customersCreateOrConnectWithoutVehiclesInput
   upsert?: Prisma.customersUpsertWithoutVehiclesInput
+  disconnect?: Prisma.customersWhereInput | boolean
+  delete?: Prisma.customersWhereInput | boolean
   connect?: Prisma.customersWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.customersUpdateToOneWithWhereWithoutVehiclesInput, Prisma.customersUpdateWithoutVehiclesInput>, Prisma.customersUncheckedUpdateWithoutVehiclesInput>
 }
@@ -505,13 +512,13 @@ export type customersUncheckedUpdateWithoutOrdersInput = {
  */
 
 export type CustomersCountOutputType = {
-  vehicles: number
   orders: number
+  vehicles: number
 }
 
 export type CustomersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  vehicles?: boolean | CustomersCountOutputTypeCountVehiclesArgs
   orders?: boolean | CustomersCountOutputTypeCountOrdersArgs
+  vehicles?: boolean | CustomersCountOutputTypeCountVehiclesArgs
 }
 
 /**
@@ -527,15 +534,15 @@ export type CustomersCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ex
 /**
  * CustomersCountOutputType without action
  */
-export type CustomersCountOutputTypeCountVehiclesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.vehiclesWhereInput
+export type CustomersCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ordersWhereInput
 }
 
 /**
  * CustomersCountOutputType without action
  */
-export type CustomersCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ordersWhereInput
+export type CustomersCountOutputTypeCountVehiclesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.vehiclesWhereInput
 }
 
 
@@ -545,8 +552,8 @@ export type customersSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   email?: boolean
   phone?: boolean
   createdAt?: boolean
-  vehicles?: boolean | Prisma.customers$vehiclesArgs<ExtArgs>
   orders?: boolean | Prisma.customers$ordersArgs<ExtArgs>
+  vehicles?: boolean | Prisma.customers$vehiclesArgs<ExtArgs>
   _count?: boolean | Prisma.CustomersCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["customers"]>
 
@@ -576,8 +583,8 @@ export type customersSelectScalar = {
 
 export type customersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "phone" | "createdAt", ExtArgs["result"]["customers"]>
 export type customersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  vehicles?: boolean | Prisma.customers$vehiclesArgs<ExtArgs>
   orders?: boolean | Prisma.customers$ordersArgs<ExtArgs>
+  vehicles?: boolean | Prisma.customers$vehiclesArgs<ExtArgs>
   _count?: boolean | Prisma.CustomersCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type customersIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -586,8 +593,8 @@ export type customersIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
 export type $customersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "customers"
   objects: {
-    vehicles: Prisma.$vehiclesPayload<ExtArgs>[]
     orders: Prisma.$ordersPayload<ExtArgs>[]
+    vehicles: Prisma.$vehiclesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -989,8 +996,8 @@ readonly fields: customersFieldRefs;
  */
 export interface Prisma__customersClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  vehicles<T extends Prisma.customers$vehiclesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.customers$vehiclesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$vehiclesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orders<T extends Prisma.customers$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.customers$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ordersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicles<T extends Prisma.customers$vehiclesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.customers$vehiclesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$vehiclesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1418,30 +1425,6 @@ export type customersDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
 }
 
 /**
- * customers.vehicles
- */
-export type customers$vehiclesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the vehicles
-   */
-  select?: Prisma.vehiclesSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the vehicles
-   */
-  omit?: Prisma.vehiclesOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.vehiclesInclude<ExtArgs> | null
-  where?: Prisma.vehiclesWhereInput
-  orderBy?: Prisma.vehiclesOrderByWithRelationInput | Prisma.vehiclesOrderByWithRelationInput[]
-  cursor?: Prisma.vehiclesWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.VehiclesScalarFieldEnum | Prisma.VehiclesScalarFieldEnum[]
-}
-
-/**
  * customers.orders
  */
 export type customers$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1463,6 +1446,30 @@ export type customers$ordersArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.OrdersScalarFieldEnum | Prisma.OrdersScalarFieldEnum[]
+}
+
+/**
+ * customers.vehicles
+ */
+export type customers$vehiclesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the vehicles
+   */
+  select?: Prisma.vehiclesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the vehicles
+   */
+  omit?: Prisma.vehiclesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.vehiclesInclude<ExtArgs> | null
+  where?: Prisma.vehiclesWhereInput
+  orderBy?: Prisma.vehiclesOrderByWithRelationInput | Prisma.vehiclesOrderByWithRelationInput[]
+  cursor?: Prisma.vehiclesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehiclesScalarFieldEnum | Prisma.VehiclesScalarFieldEnum[]
 }
 
 /**

@@ -4,6 +4,7 @@ export const createOrderSchema = z.object({
   vehicleId: z.coerce.number().int("Vehicle ID must be an integer"),
   customerId: z.coerce.number().int("Customer ID must be an integer"),
   status: z.enum(["PENDING", "PROCESSING", "COMPLETED", "CANCELLED"]).default("PENDING"),
+  note: z.string().optional(),
   items: z.array(z.object({
     serviceId: z.coerce.number().int("Service ID must be an integer"),
     duration: z.coerce.number().int("Duration must be an integer"),

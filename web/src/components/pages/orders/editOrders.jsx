@@ -1,15 +1,29 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useParams, useNavigate } from 'react-router'
 import orderController from '../../../controllers/orderController.js'
 import serviceController from '../../../controllers/serviceController.js'
 import useCartStore from '../../../stores/cartStore.js'
 
-const CreateOrders = () => {
+const EditOrders = () => {
+  const { id } = useParams()
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const [fetching, setFetching] = useState(true)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
   const [services, setServices] = useState([])
   const [fetchingServices, setFetchingServices] = useState(true)
+
+  const user = (() => {
+    try {
+      const stored = localStorage.getItem('user')
+      return stored ? JSON.parse(stored) : null
+    } catch {
+      return null
+    }
+  })()
+
+  const canDelete = user?.role === 'ADMIN'
 
   const [form, setForm] = useState({
     vehicleId: '',
@@ -25,6 +39,7 @@ const CreateOrders = () => {
   const updateQuantity = useCartStore((s) => s.updateQuantity)
   const removeItem = useCartStore((s) => s.removeItem)
   const clearCart = useCartStore((s) => s.clearCart)
+  const setItems = useCartStore((s) => s.setItems)
   const totalAmount = useCartStore((s) => s.totalAmount)
   const totalItems = useCartStore((s) => s.totalItems)
   const totalDuration = useCartStore((s) => s.totalDuration)
@@ -53,6 +68,45 @@ const CreateOrders = () => {
     return () => { cancelled = true }
   }, [setServiceOptions])
 
+  useEffect(() => {
+    let cancelled = false
+    const loadOrder = async () => {
+      setFetching(true)
+      setError(null)
+      try {
+        const order = await orderController.fetchOrderById(id)
+        if (!cancelled) {
+          setForm({
+            vehicleId: String(order.vehicleId),
+            customerId: String(order.customerId),
+            status: order.status || 'PENDING',
+            note: order.note || '',
+          })
+          if (order.order_items && order.order_items.length > 0) {
+            const items = order.order_items.map((item) => ({
+              serviceId: item.serviceId,
+              service: item.service?.name || '',
+              duration: item.duration,
+              price: item.price,
+              quantity: item.qty,
+              subtotal: item.subtotal,
+              empty: false,
+            }))
+            setItems(items)
+          } else {
+            clearCart()
+          }
+        }
+      } catch (err) {
+        if (!cancelled) setError(err.response?.data?.message || 'Failed to load order.')
+      } finally {
+        if (!cancelled) setFetching(false)
+      }
+    }
+    loadOrder()
+    return () => { cancelled = true }
+  }, [id, setItems, clearCart])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -77,26 +131,59 @@ const CreateOrders = () => {
           subtotal: item.subtotal,
         })),
       }
-      await orderController.createOrder(orderData)
+      await orderController.updateOrder(id, orderData)
       setSuccess(true)
-      clearCart()
       setTimeout(() => {
         setSuccess(false)
-        setForm({ vehicleId: '', customerId: '', status: 'PENDING', note: '' })
       }, 1500)
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create order.')
+      setError(err.response?.data?.message || 'Failed to update order.')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this order?')) return
+    setLoading(true)
+    setError(null)
+    try {
+      await orderController.deleteOrder(id)
+      navigate('/orders')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete order.')
+      setLoading(false)
+    }
+  }
+
+  if (fetching) {
+    return (
+      <div className=''>
+        <div className="flex flex-row justify-between items-center mb-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Edit Order</h1>
+            <p className="text-gray-600 dark:text-gray-300">Loading order #{id}...</p>
+          </div>
+          <Link to="/orders" className="btn btn-ghost">
+            <span className="material-symbols-outlined mr-1">arrow_back</span>
+            Back to Orders
+          </Link>
+        </div>
+        <div className="card bg-white dark:bg-gray-950 p-4 rounded-lg shadow-md">
+          <div className="p-8 text-center">
+            <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className=''>
       <div className="flex flex-row justify-between items-center mb-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Create Order</h1>
-          <p className="text-gray-600 dark:text-gray-300">Create a new order for the car wash service.</p>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Edit Order</h1>
+          <p className="text-gray-600 dark:text-gray-300">Update order #{id}.</p>
         </div>
         <Link to="/orders" className="btn btn-ghost">
           <span className="material-symbols-outlined mr-1">arrow_back</span>
@@ -107,7 +194,7 @@ const CreateOrders = () => {
       {success && (
         <div className="alert alert-success mb-4">
           <span className="material-symbols-outlined">check_circle</span>
-          <span>Order created successfully!</span>
+          <span>Order updated successfully!</span>
         </div>
       )}
 
@@ -180,7 +267,7 @@ const CreateOrders = () => {
               <span className="loading loading-spinner loading-lg text-indigo-600"></span>
             </div>
           ) : (
-            <div className="overflow-x-auto max-h-64 overflow-y-auto border-b border-gray-200 dark:border-gray-700">
+            <div className="overflow-x-auto max-h-64 overflow-y-auto">
               <table className="table">
                 <thead>
                   <tr>
@@ -273,7 +360,7 @@ const CreateOrders = () => {
             </div>
           )}
 
-          <div className='flex flex-col gap-2 mt-5 '>
+          <div className='flex flex-col gap-2 mt-5'>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes (optional)</label>
             <input
               type='text'
@@ -284,7 +371,7 @@ const CreateOrders = () => {
             />
           </div>
 
-          <div className="flex gap-10 flex-row justify-end mt-4 pt-4">
+          <div className="flex gap-10 flex-row justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div>
               <div className="text-right">
                 <p className="text-sm text-gray-500 dark:text-gray-400">Total Items</p>
@@ -301,16 +388,23 @@ const CreateOrders = () => {
               <div className="text-right">
                 <p className="text-sm text-gray-500 dark:text-gray-400">Total Price</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">${totalAmount().toFixed(2)}</p>
-               
+                {totalItems() > 0 && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{totalItems()} service(s)</p>
+                )}
               </div>
             </div>
           </div>
         </div>
 
         <div className="flex justify-end gap-2">
+          {canDelete && (
+            <button type="button" className="btn btn-error" onClick={handleDelete} disabled={loading}>
+              Delete Order
+            </button>
+          )}
           <Link to="/orders" className="btn btn-ghost">Cancel</Link>
           <button type="submit" className="btn btn-primary" disabled={loading || cartItems.length === 0}>
-            {loading ? 'Creating...' : 'Create Order'}
+            {loading ? 'Updating...' : 'Update Order'}
           </button>
         </div>
       </form>
@@ -318,4 +412,4 @@ const CreateOrders = () => {
   )
 }
 
-export default CreateOrders
+export default EditOrders

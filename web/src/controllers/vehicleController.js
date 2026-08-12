@@ -1,4 +1,4 @@
-import { api } from '../services/api'
+import { api } from '../api/api'
 
 export const fetchVehicles = async () => {
   const res = await api.get('/vehicles')
