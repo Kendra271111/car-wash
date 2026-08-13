@@ -30,8 +30,12 @@ export const computeStats = (orders) => {
   return stats
 }
 
-export const fetchOrders = async () => {
-  const res = await api.get('/orders')
+export const fetchOrders = async (search = '', { startDate, endDate } = {}) => {
+  const params = {}
+  if (search) params.search = search
+  if (startDate) params.startDate = startDate
+  if (endDate) params.endDate = endDate
+  const res = await api.get('/orders', { params })
   return res.data.data || []
 }
 

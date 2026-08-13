@@ -1,7 +1,7 @@
 import { api } from '../api/api'
 
-export const fetchServices = async () => {
-  const res = await api.get('/services')
+export const fetchServices = async (search = '') => {
+  const res = await api.get('/services', search ? { params: { search } } : undefined)
   return res.data.data || []
 }
 

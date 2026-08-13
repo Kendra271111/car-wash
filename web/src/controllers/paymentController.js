@@ -10,8 +10,8 @@ export const getPaymentByOrderId = async (orderId) => {
   return res.data.data
 }
 
-export const fetchPayments = async () => {
-  const res = await api.get('/payments')
+export const fetchPayments = async (search = '') => {
+  const res = await api.get('/payments', search ? { params: { search } } : undefined)
   return res.data.data || []
 }
 

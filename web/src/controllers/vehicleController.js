@@ -1,7 +1,7 @@
 import { api } from '../api/api'
 
-export const fetchVehicles = async () => {
-  const res = await api.get('/vehicles')
+export const fetchVehicles = async (search = '') => {
+  const res = await api.get('/vehicles', search ? { params: { search } } : undefined)
   return res.data.data || []
 }
 

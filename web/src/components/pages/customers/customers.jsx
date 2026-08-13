@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router'
 import customerController from '../../../controllers/customerController.js'
 
@@ -6,6 +6,7 @@ const Customers = () => {
   const [customers, setCustomers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -13,7 +14,7 @@ const Customers = () => {
       setLoading(true)
       setError(null)
       try {
-        const data = await customerController.fetchCustomers()
+        const data = await customerController.fetchCustomers(search)
         if (!cancelled) setCustomers(data)
       } catch (err) {
         if (!cancelled) setError(err.response?.data?.message || 'Failed to load customers.')
@@ -23,14 +24,32 @@ const Customers = () => {
     }
     loadCustomers()
     return () => { cancelled = true }
-  }, [])
+  }, [search])
+
+  const filtered = useMemo(() => {
+    if (!search) return customers
+    const q = search.toLowerCase()
+    return customers.filter((c) =>
+      (c.name || '').toLowerCase().includes(q) ||
+      (c.email || '').toLowerCase().includes(q)
+    )
+  }, [customers, search])
 
   return (
     <div>
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Customers</h1>
-          <Link to="/customers/create" className="btn btn-primary">Add Customer</Link>
+          <div className="flex flex-row gap-2">
+            <input
+              type="text"
+              className="input input-bordered input-sm w-64"
+              placeholder="Search customers..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <Link to="/customers/create" className="btn btn-primary btn-sm">Add Customer</Link>
+          </div>
         </div>
 
         {error && (
@@ -46,7 +65,7 @@ const Customers = () => {
               <div className="p-8 text-center">
                 <span className="loading loading-spinner loading-lg text-indigo-600"></span>
               </div>
-            ) : customers.length === 0 ? (
+            ) : filtered.length === 0 ? (
               <div className="p-8 text-center">
                 <p className="text-gray-500 dark:text-gray-400">No customers found.</p>
               </div>
@@ -61,7 +80,7 @@ const Customers = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {customers.map((customer) => (
+                  {filtered.map((customer) => (
                     <tr key={customer.id}>
                       <td>{customer.id}</td>
                       <td>{customer.name}</td>

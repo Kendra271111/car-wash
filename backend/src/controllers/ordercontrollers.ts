@@ -84,7 +84,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 
 export const getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { search, status, page = '1', limit = '10' } = req.query;
+    const { search, status, page = '1', limit = '10', startDate, endDate } = req.query;
     const pageNum = Number(page);
     const limitNum = Number(limit);
     const skip = (pageNum - 1) * limitNum;
@@ -98,6 +98,12 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
     }
     if (status) {
       where.status = status as string;
+    }
+    if (startDate || endDate) {
+      const createdAt: any = {};
+      if (startDate) createdAt.gte = new Date(startDate as string)
+      if (endDate) createdAt.lte = new Date(endDate as string)
+      where.createdAt = createdAt
     }
 
     const [orders, total_data] = await Promise.all([

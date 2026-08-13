@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router";
 import orderController from "../../../controllers/orderController.js";
 import serviceController from "../../../controllers/serviceController.js";
@@ -12,14 +12,8 @@ const CreateOrders = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [services, setServices] = useState([]);
-  const [fetchingServices, setFetchingServices] = useState(true);
-  const [vehicles, setVehicles] = useState([]);
-  const [fetchingVehicles, setFetchingVehicles] = useState(true);
-  const [customers, setCustomers] = useState([]);
-  const [fetchingCustomers, setFetchingCustomers] = useState(true);
-  const [staffList, setStaffList] = useState([]);
-  const [fetchingStaff, setFetchingStaff] = useState(true);
+  const [options, setOptions] = useState({ services: [], vehicles: [], customers: [], staff: [] });
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const [form, setForm] = useState({
     vehicleId: "",
@@ -29,7 +23,7 @@ const CreateOrders = () => {
     note: "",
   });
 
-  const cartItems = useCartStore((s) => s.items) || [];
+  const cartItems = useCartStore((s) => s.items);
   const setServiceOptions = useCartStore((s) => s.setServiceOptions);
   const addEmptyItem = useCartStore((s) => s.addEmptyItem);
   const selectService = useCartStore((s) => s.selectService);
@@ -41,96 +35,51 @@ const CreateOrders = () => {
   const totalDuration = useCartStore((s) => s.totalDuration);
 
   const updateField = (field, value) => {
-    setForm({ ...form, [field]: value });
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   useEffect(() => {
     let cancelled = false;
-    const loadVehicles = async () => {
-      setFetchingVehicles(true);
+    const loadOptions = async () => {
+      setInitialLoading(true);
       try {
-        const data = await vehicleController.fetchVehicles();
-        if (!cancelled) setVehicles(data);
-      } catch (err) {
-        console.error("Failed to load vehicles:", err);
-      } finally {
-        if (!cancelled) setFetchingVehicles(false);
-      }
-    };
-    loadVehicles();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    const loadCustomers = async () => {
-      setFetchingCustomers(true);
-      try {
-        const data = await customerController.fetchCustomers();
-        if (!cancelled) setCustomers(data);
-      } catch (err) {
-        console.error("Failed to load customers:", err);
-      } finally {
-        if (!cancelled) setFetchingCustomers(false);
-      }
-    };
-    loadCustomers();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    const loadStaff = async () => {
-      setFetchingStaff(true);
-      try {
-        const data = await staffController.getStaff();
-        if (!cancelled) setStaffList(data);
-      } catch (err) {
-        console.error("Failed to load staff:", err);
-      } finally {
-        if (!cancelled) setFetchingStaff(false);
-      }
-    };
-    loadStaff();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    const loadServices = async () => {
-      setFetchingServices(true);
-      try {
-        const data = await serviceController.fetchServices();
+        const [vehicles, customers, staff, services] = await Promise.all([
+          vehicleController.fetchVehicles(),
+          customerController.fetchCustomers(),
+          staffController.getStaff(),
+          serviceController.fetchServices(),
+        ]);
         if (!cancelled) {
-          setServices(data);
-          setServiceOptions(data);
+          setOptions({ services, vehicles, customers, staff });
+          setServiceOptions(services);
         }
       } catch (err) {
-        console.error("Failed to load services:", err);
+        console.error("Failed to load options:", err);
       } finally {
-        if (!cancelled) setFetchingServices(false);
+        if (!cancelled) setInitialLoading(false);
       }
     };
-    loadServices();
+    loadOptions();
     return () => {
       cancelled = true;
     };
   }, [setServiceOptions]);
+
+  useEffect(() => {
+    if (!success) return;
+    const timer = setTimeout(() => {
+      setSuccess(false);
+      setForm({ vehicleId: "", customerId: "", staffId: "", status: "PENDING", note: "" });
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [success]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
-      const validItems = cartItems.filter(
-        (item) => !item.empty && item.serviceId,
-      );
+      const validItems = cartItems.filter((item) => !item.empty && item.serviceId);
       if (validItems.length === 0) {
         setError("Please add at least one service.");
         return;
@@ -157,22 +106,41 @@ const CreateOrders = () => {
       await orderController.createOrder(orderData);
       setSuccess(true);
       clearCart();
-      setTimeout(() => {
-        setSuccess(false);
-        setForm({
-          vehicleId: "",
-          customerId: "",
-          staffId: "",
-          status: "PENDING",
-          note: "",
-        });
-      }, 1500);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to create order.");
     } finally {
       setLoading(false);
     }
   };
+
+  const isEmpty = cartItems.length === 0;
+  const isSubmitting = loading || isEmpty;
+
+  if (initialLoading) {
+    return (
+      <div className="">
+        <div className="flex flex-row justify-between items-center mb-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Create Order
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300">
+              Create a new order for the car wash service.
+            </p>
+          </div>
+          <Link to="/orders" className="btn btn-ghost">
+            <span className="material-symbols-outlined mr-1">arrow_back</span>
+            Back to Orders
+          </Link>
+        </div>
+        <div className="card bg-white dark:bg-gray-950 p-4 rounded-lg shadow-md">
+          <div className="p-8 text-center">
+            <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="">
@@ -215,7 +183,7 @@ const CreateOrders = () => {
               <div className="w-full">
                 <SearchableSelect
                   label="Vehicle"
-                  options={vehicles}
+                  options={options.vehicles}
                   value={form.vehicleId}
                   onChange={(value) => updateField("vehicleId", value)}
                   placeholder="Select vehicle"
@@ -228,7 +196,7 @@ const CreateOrders = () => {
               <div className="w-full">
                 <SearchableSelect
                   label="Customer"
-                  options={customers}
+                  options={options.customers}
                   value={form.customerId}
                   onChange={(value) => updateField("customerId", value)}
                   placeholder="Select customer"
@@ -241,7 +209,7 @@ const CreateOrders = () => {
               <div className="w-full">
                 <SearchableSelect
                   label="Staff"
-                  options={staffList}
+                  options={options.staff}
                   value={form.staffId}
                   onChange={(value) => updateField("staffId", value)}
                   placeholder="Select staff"
@@ -284,7 +252,7 @@ const CreateOrders = () => {
             </button>
           </div>
 
-          {fetchingServices ? (
+          {initialLoading ? (
             <div className="p-8 text-center">
               <span className="loading loading-spinner loading-lg text-indigo-600"></span>
             </div>
@@ -320,7 +288,7 @@ const CreateOrders = () => {
                               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
                               value=""
                               onChange={(e) => {
-                                const service = services.find(
+                                const service = options.services.find(
                                   (s) => s.id === Number(e.target.value),
                                 );
                                 if (service) {
@@ -332,7 +300,7 @@ const CreateOrders = () => {
                               <option value="" disabled>
                                 Select a service...
                               </option>
-                              {services?.map((service) => (
+                              {options.services?.map((service) => (
                                 <option key={service.id} value={service.id}>
                                   {service.name}
                                 </option>
@@ -457,7 +425,7 @@ const CreateOrders = () => {
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={loading || cartItems.length === 0}
+            disabled={isSubmitting}
           >
             {loading ? "Creating..." : "Create Order"}
           </button>

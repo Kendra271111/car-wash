@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router'
 import serviceController from '../../../controllers/serviceController.js'
 
@@ -6,6 +6,7 @@ const Services = () => {
   const [services, setServices] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -13,7 +14,7 @@ const Services = () => {
       setLoading(true)
       setError(null)
       try {
-        const data = await serviceController.fetchServices()
+        const data = await serviceController.fetchServices(search)
         if (!cancelled) setServices(data)
       } catch (err) {
         if (!cancelled) setError(err.response?.data?.message || 'Failed to load services.')
@@ -23,14 +24,29 @@ const Services = () => {
     }
     loadServices()
     return () => { cancelled = true }
-  }, [])
+  }, [search])
+
+  const filtered = useMemo(() => {
+    if (!search) return services
+    const q = search.toLowerCase()
+    return services.filter((s) => (s.name || '').toLowerCase().includes(q))
+  }, [services, search])
 
   return (
     <div>
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Services</h1>
-          <Link to="/services/create" className="btn btn-primary">Add Service</Link>
+          <div className="flex flex-row gap-2">
+            <input
+              type="text"
+              className="input input-bordered input-sm w-64"
+              placeholder="Search services..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <Link to="/services/create" className="btn btn-primary btn-sm">Add Service</Link>
+          </div>
         </div>
 
         {error && (
@@ -46,7 +62,7 @@ const Services = () => {
               <div className="p-8 text-center">
                 <span className="loading loading-spinner loading-lg text-indigo-600"></span>
               </div>
-            ) : services.length === 0 ? (
+            ) : filtered.length === 0 ? (
               <div className="p-8 text-center">
                 <p className="text-gray-500 dark:text-gray-400">No services found.</p>
               </div>
@@ -61,7 +77,7 @@ const Services = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {services.map((service) => (
+                  {filtered.map((service) => (
                     <tr key={service.id}>
                       <td>{service.id}</td>
                       <td>{service.name}</td>

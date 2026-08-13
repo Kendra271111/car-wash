@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router'
 import paymentController from '../../controllers/paymentController.js'
 
@@ -7,6 +7,7 @@ const Payments = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [refetchKey, setRefetchKey] = useState(0)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -14,7 +15,7 @@ const Payments = () => {
       setLoading(true)
       setError(null)
       try {
-        const data = await paymentController.fetchPayments()
+        const data = await paymentController.fetchPayments(search)
         if (!cancelled) setPayments(data)
       } catch (err) {
         if (!cancelled) setError(err.response?.data?.message || 'Failed to load payments.')
@@ -24,7 +25,17 @@ const Payments = () => {
     }
     loadPayments()
     return () => { cancelled = true }
-  }, [refetchKey])
+  }, [refetchKey, search])
+
+  const filtered = useMemo(() => {
+    if (!search) return payments
+    const q = search.toLowerCase()
+    return payments.filter((p) =>
+      (p.order?.customer?.name || '').toLowerCase().includes(q) ||
+      (p.method || '').toLowerCase().includes(q) ||
+      (p.status || '').toLowerCase().includes(q)
+    )
+  }, [payments, search])
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-US', {
@@ -56,10 +67,19 @@ const Payments = () => {
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Payments</h1>
-          <button className="btn btn-ghost btn-sm" onClick={() => setRefetchKey((k) => k + 1)}>
-            <span className="material-symbols-outlined mr-1">refresh</span>
-            Refresh
-          </button>
+          <div className="flex flex-row gap-2">
+            <input
+              type="text"
+              className="input input-bordered input-sm w-64"
+              placeholder="Search payments..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <button className="btn btn-ghost btn-sm" onClick={() => setRefetchKey((k) => k + 1)}>
+              <span className="material-symbols-outlined mr-1">refresh</span>
+              Refresh
+            </button>
+          </div>
         </div>
 
         <div className="card bg-white dark:bg-gray-950 rounded-lg shadow-md overflow-hidden">
@@ -73,7 +93,7 @@ const Payments = () => {
                 <p className="text-error">{error}</p>
                 <button className="btn btn-ghost btn-sm mt-2" onClick={() => setRefetchKey((k) => k + 1)}>Retry</button>
               </div>
-            ) : payments.length === 0 ? (
+            ) : filtered.length === 0 ? (
               <div className="p-8 text-center">
                 <p className="text-gray-500 dark:text-gray-400">No payments found.</p>
               </div>
@@ -92,7 +112,7 @@ const Payments = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {payments.map((payment) => (
+                  {filtered.map((payment) => (
                     <tr key={payment.id}>
                       <td>#{payment.orderId}</td>
                       <td>

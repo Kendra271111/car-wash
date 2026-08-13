@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router'
 import vehicleController from '../../../controllers/vehicleController.js'
 
@@ -6,6 +6,7 @@ const Vehicles = () => {
   const [vehicles, setVehicles] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -13,7 +14,7 @@ const Vehicles = () => {
       setLoading(true)
       setError(null)
       try {
-        const data = await vehicleController.fetchVehicles()
+        const data = await vehicleController.fetchVehicles(search)
         if (!cancelled) setVehicles(data)
       } catch (err) {
         if (!cancelled) setError(err.response?.data?.message || 'Failed to load vehicles.')
@@ -23,14 +24,34 @@ const Vehicles = () => {
     }
     loadVehicles()
     return () => { cancelled = true }
-  }, [])
+  }, [search])
+
+  const filtered = useMemo(() => {
+    if (!search) return vehicles
+    const q = search.toLowerCase()
+    return vehicles.filter((v) =>
+      (v.name || '').toLowerCase().includes(q) ||
+      (v.plateNumber || '').toLowerCase().includes(q) ||
+      (v.brand || '').toLowerCase().includes(q) ||
+      (v.model || '').toLowerCase().includes(q)
+    )
+  }, [vehicles, search])
 
   return (
     <div>
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Vehicles</h1>
-          <Link to="/vehicles/create" className="btn btn-primary">Add Vehicle</Link>
+          <div className="flex flex-row gap-2">
+            <input
+              type="text"
+              className="input input-bordered input-sm w-64"
+              placeholder="Search vehicles..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <Link to="/vehicles/create" className="btn btn-primary btn-sm">Add Vehicle</Link>
+          </div>
         </div>
 
         {error && (
@@ -46,7 +67,7 @@ const Vehicles = () => {
               <div className="p-8 text-center">
                 <span className="loading loading-spinner loading-lg text-indigo-600"></span>
               </div>
-            ) : vehicles.length === 0 ? (
+            ) : filtered.length === 0 ? (
               <div className="p-8 text-center">
                 <p className="text-gray-500 dark:text-gray-400">No vehicles found.</p>
               </div>
@@ -62,7 +83,7 @@ const Vehicles = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {vehicles.map((vehicle) => (
+                  {filtered.map((vehicle) => (
                     <tr key={vehicle.id}>
                       <td>{vehicle.id}</td>
                       <td>{vehicle.name}</td>
