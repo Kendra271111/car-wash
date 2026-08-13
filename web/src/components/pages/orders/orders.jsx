@@ -29,15 +29,20 @@ const Orders = () => {
     return () => { cancelled = true }
   }, [refetchKey])
 
-  const stats = computeStats(orders)
-  const totalCount = orders.length
+  const activeOrders = orders.filter((o) => {
+    const isCompletedPaid = (o.status || 'PENDING') === 'COMPLETED' && o.payements?.some((p) => p.status === 'PAID')
+    return !isCompletedPaid
+  })
 
-  const filtered = filter === 'all' ? orders : orders.filter((o) => (o.status || 'PENDING') === filter)
+  const stats = computeStats(activeOrders)
+  const totalCount = activeOrders.length
+
+  const filtered = filter === 'all' ? activeOrders : activeOrders.filter((o) => (o.status || 'PENDING') === filter)
 
   const statCards = [
     { label: 'Waiting', value: stats.PENDING, desc: 'orders waiting to be processed' },
     { label: 'In Progress', value: stats.PROCESSING, desc: 'orders currently being processed' },
-    { label: 'Completed', value: stats.COMPLETED, desc: 'completed orders' },
+    { label: 'Completed (unpaid)', value: stats.COMPLETED, desc: 'completed but unpaid orders' },
     { label: 'Cancelled', value: stats.CANCELLED, desc: 'Cancelled orders' },
   ]
 
@@ -84,7 +89,13 @@ const Orders = () => {
             className={`btn btn-ghost btn-sm ${filter === 'COMPLETED' ? 'btn-active' : ''}`}
             onClick={() => setFilter('COMPLETED')}
           >
-            Completed ({stats.COMPLETED})
+            Completed (unpaid) ({stats.COMPLETED})
+          </button>
+          <button
+            className={`btn btn-ghost btn-sm ${filter === 'CANCELLED' ? 'btn-active' : ''}`}
+            onClick={() => setFilter('CANCELLED')}
+          >
+            Cancelled ({stats.CANCELLED})
           </button>
         </div>
 
@@ -164,7 +175,9 @@ const Orders = () => {
                         </td>
                         <td>
                           <span className={`badge ${statusColors[status] || 'badge-neutral'}`}>
-                            {statusLabels[status] || status}
+                            {status === 'COMPLETED' && !order.payements?.some((p) => p.status === 'PAID')
+                              ? 'Completed (unpaid)'
+                              : statusLabels[status] || status}
                           </span>
                         </td>
                         <td>

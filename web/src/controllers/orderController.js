@@ -50,6 +50,11 @@ export const updateOrder = async (id, orderData) => {
   return res.data
 }
 
+export const updateOrderStatus = async (id, status) => {
+  const res = await api.patch(`/orders/${id}/status`, { status })
+  return res.data
+}
+
 export const deleteOrder = async (id) => {
   const res = await api.delete(`/orders/${id}`)
   return res.data
@@ -64,5 +69,6 @@ export default {
   fetchOrderById,
   createOrder,
   updateOrder,
+  updateOrderStatus,
   deleteOrder,
 }

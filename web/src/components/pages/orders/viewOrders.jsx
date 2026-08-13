@@ -7,6 +7,8 @@ const ViewOrder = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [order, setOrder] = useState(null);
+  const [completing, setCompleting] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -29,6 +31,24 @@ const ViewOrder = () => {
     };
   }, [id]);
 
+  const handleMarkAsCompleted = async () => {
+    setCompleting(true);
+    setError(null);
+    try {
+      await orderController.updateOrderStatus(id, "COMPLETED");
+      setSuccess(true);
+      setOrder((prev) => (prev ? { ...prev, status: "COMPLETED" } : prev));
+      setTimeout(() => {
+        setSuccess(false);
+        navigate("/orders");
+      }, 1000);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to mark order as completed.");
+    } finally {
+      setCompleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="">
@@ -41,7 +61,7 @@ const ViewOrder = () => {
           </div>
           <Link to="/orders" className="btn btn-ghost">
             <span className="material-symbols-outlined mr-1">arrow_back</span>
-            Back to Orders
+            Back
           </Link>
         </div>
         <div className="card bg-white dark:bg-gray-950 p-4 rounded-lg shadow-md">
@@ -65,10 +85,17 @@ const ViewOrder = () => {
               View the order here
             </p>
           </div>
-          <Link to="/orders" className="btn btn-ghost">
-            <span className="material-symbols-outlined mr-1">arrow_back</span>
-            Back to Orders
-          </Link>
+          {order.status !== "COMPLETED" || !payment ? (
+            <Link to="/orders" className="btn btn-ghost">
+              <span className="material-symbols-outlined mr-1">arrow_back</span>
+              Back to Orders
+            </Link>
+            ) : (
+            <Link to="/history" className="btn btn-ghost">
+              <span className="material-symbols-outlined mr-1">arrow_back</span>
+              Back to History
+            </Link>
+            )}
         </div>
         <div className="alert alert-error">
           <span className="material-symbols-outlined">error</span>
@@ -121,10 +148,17 @@ const ViewOrder = () => {
             View order ID #{order.id}.
           </p>
         </div>
-        <Link to="/orders" className="btn btn-ghost">
-          <span className="material-symbols-outlined mr-1">arrow_back</span>
-          Back to Orders
-        </Link>
+        {order.status !== "COMPLETED" || !payment ? (
+          <Link to="/orders" className="btn btn-ghost">
+            <span className="material-symbols-outlined mr-1">arrow_back</span>
+            Back to Orders
+          </Link>
+          ) : (
+          <Link to="/history" className="btn btn-ghost">
+            <span className="material-symbols-outlined mr-1">arrow_back</span>
+            Back to History
+          </Link>
+          )}
       </div>
 
       <div className="flex-row flex">
@@ -336,13 +370,25 @@ const ViewOrder = () => {
 
       <div className="flex flex-col gap-2 max-w-full">
         <div className="flex flex-row gap-2 w-full">
-          <button className="btn btn-primary w-[50%]">Mark as Completed</button>
-          <Link
-            to={`/payments?orderId=${order.id}`}
-            className="btn btn-secondary w-[50%]"
-          >
-            Go to Payment
-          </Link>
+          {(order.status === "PENDING" || order.status === "PROCESSING") && (
+            <button
+              onClick={handleMarkAsCompleted}
+              className="btn btn-primary w-[50%]"
+              disabled={completing}
+            >
+              {completing ? "Updating..." : "Mark as Completed"}
+            </button>
+          )}
+          {order.status !== "COMPLETED" || !payment ? (
+            <Link
+              to={`/payments/${order.id}`}
+              className="btn btn-secondary w-[50%]"
+            >
+              Go to Payment
+            </Link>
+          ) : (
+            <div></div>
+          )}
         </div>
         <button className="btn btn-ghost">Print Service Ticket</button>
       </div>

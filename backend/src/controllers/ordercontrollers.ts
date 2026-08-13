@@ -4,12 +4,12 @@ import prisma from '../libs/prisma';
 
 export const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { vehicleId, customerId, serviceId, status, note, items = [] } = req.body as {
+    const { vehicleId, customerId, status, note, staffId, items = [] } = req.body as {
       vehicleId?: string | number
       customerId?: string | number
-      serviceId?: string | number
       status?: string
       note?: string
+      staffId?: number | string
       items?: {
         serviceId?: number | string
         duration?: number | string
@@ -22,15 +22,10 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 
     const vId = Number(vehicleId)
     const cId = Number(customerId)
-    const userId = Number((req as any).user?.id)
+    const sId = Number(staffId)
 
-    if (!vId || !cId || !userId) {
-      return res.status(400).json({ message: 'vehicleId, customerId are required and you must be logged in.' });
-    }
-
-    const existingStaff = await prisma.staff.findUnique({ where: { userId } })
-    if (!existingStaff) {
-      return res.status(400).json({ message: 'No staff record found for the logged-in user.' });
+    if (!vId || !cId || !sId) {
+      return res.status(400).json({ message: 'vehicleId, customerId, and staffId are required.' });
     }
 
     const validItems = items.filter((item) => item.serviceId)
@@ -51,7 +46,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
       data: {
         vehicleId: vId,
         customerId: cId,
-        staffId: existingStaff.id,
+        staffId: sId,
         status: status || 'PENDING',
         note: note || '',
         order_items: {
@@ -176,12 +171,11 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
 export const updateOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const { vehicleId, customerId, status, note, items = [] } = req.body;
-    const userId = Number((req as any).user?.id)
+    const { vehicleId, customerId, status, note, staffId, items = [] } = req.body;
+    const sId = Number(staffId)
 
-    const existingStaff = await prisma.staff.findUnique({ where: { userId } })
-    if (!existingStaff) {
-      return res.status(400).json({ message: 'No staff record found for the logged-in user.' });
+    if (!vehicleId || !customerId || !sId) {
+      return res.status(400).json({ message: 'vehicleId, customerId, and staffId are required.' });
     }
 
     const updatedOrder = await prisma.orders.update({
@@ -189,7 +183,7 @@ export const updateOrder = async (req: Request, res: Response, next: NextFunctio
       data: {
         vehicleId: Number(vehicleId),
         customerId: Number(customerId),
-        staffId: existingStaff.id,
+        staffId: sId,
         status,
         note: note || '',
         order_items: {
@@ -236,6 +230,36 @@ export const deleteOrder = async (req: Request, res: Response, next: NextFunctio
 
     return res.status(200).json({
       message: 'Order deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateOrderStatus = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const updatedOrder = await prisma.orders.update({
+      where: { id: Number(id) },
+      data: { status },
+      include: {
+        vehicle: true,
+        customer: true,
+        staff: { select: { id: true, name: true, email: true } },
+        order_items: {
+          include: {
+            service: true,
+          },
+        },
+        payements: true,
+      },
+    });
+
+    return res.status(200).json({
+      message: 'Order status updated successfully',
+      data: updatedOrder,
     });
   } catch (error) {
     next(error);

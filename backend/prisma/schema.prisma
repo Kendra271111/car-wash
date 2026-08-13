@@ -77,6 +77,7 @@ model payments {
   id        Int      @id @default(autoincrement())
   orderId   Int
   amount    Float
+  change    Float
   method    String
   status    String   @default("PENDING")
   createdAt DateTime @default(now())

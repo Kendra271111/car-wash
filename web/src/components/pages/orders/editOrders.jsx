@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router'
 import orderController from '../../../controllers/orderController.js'
 import serviceController from '../../../controllers/serviceController.js'
+import vehicleController from '../../../controllers/vehicleController.js'
+import customerController from '../../../controllers/customerController.js'
+import staffController from '../../../controllers/staffController.js'
 import useCartStore from '../../../stores/cartStore.js'
+import SearchableSelect from '../../../components/ui/searchableSelect.jsx'
 
 const EditOrders = () => {
   const { id } = useParams()
@@ -13,6 +17,12 @@ const EditOrders = () => {
   const [success, setSuccess] = useState(false)
   const [services, setServices] = useState([])
   const [fetchingServices, setFetchingServices] = useState(true)
+  const [vehicles, setVehicles] = useState([])
+  const [fetchingVehicles, setFetchingVehicles] = useState(true)
+  const [customers, setCustomers] = useState([])
+  const [fetchingCustomers, setFetchingCustomers] = useState(true)
+  const [staffList, setStaffList] = useState([])
+  const [fetchingStaff, setFetchingStaff] = useState(true)
 
   const user = (() => {
     try {
@@ -28,6 +38,7 @@ const EditOrders = () => {
   const [form, setForm] = useState({
     vehicleId: '',
     customerId: '',
+    staffId: '',
     status: 'PENDING',
     note: '',
   })
@@ -47,6 +58,57 @@ const EditOrders = () => {
   const updateField = (field, value) => {
     setForm({ ...form, [field]: value })
   }
+
+  useEffect(() => {
+    let cancelled = false
+    const loadVehicles = async () => {
+      setFetchingVehicles(true)
+      try {
+        const data = await vehicleController.fetchVehicles()
+        if (!cancelled) setVehicles(data)
+      } catch (err) {
+        console.error('Failed to load vehicles:', err)
+      } finally {
+        if (!cancelled) setFetchingVehicles(false)
+      }
+    }
+    loadVehicles()
+    return () => { cancelled = true }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    const loadCustomers = async () => {
+      setFetchingCustomers(true)
+      try {
+        const data = await customerController.fetchCustomers()
+        if (!cancelled) setCustomers(data)
+      } catch (err) {
+        console.error('Failed to load customers:', err)
+      } finally {
+        if (!cancelled) setFetchingCustomers(false)
+      }
+    }
+    loadCustomers()
+    return () => { cancelled = true }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    const loadStaff = async () => {
+      setFetchingStaff(true)
+      try {
+        const data = await staffController.getStaff()
+        if (!cancelled) setStaffList(data)
+      } catch (err) {
+        console.error('Failed to load staff:', err)
+      } finally {
+        if (!cancelled) setFetchingStaff(false)
+      }
+    }
+    loadStaff()
+    return () => { cancelled = true }
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -79,6 +141,7 @@ const EditOrders = () => {
           setForm({
             vehicleId: String(order.vehicleId),
             customerId: String(order.customerId),
+            staffId: order.staffId ? String(order.staffId) : '',
             status: order.status || 'PENDING',
             note: order.note || '',
           })
@@ -120,6 +183,7 @@ const EditOrders = () => {
       const orderData = {
         vehicleId: Number(form.vehicleId),
         customerId: Number(form.customerId),
+        staffId: Number(form.staffId),
         status: form.status,
         note: form.note,
         items: validItems.map((item) => ({
@@ -211,25 +275,35 @@ const EditOrders = () => {
           <div className="flex-col flex gap-4">
             <div className='w-full flex flex-row gap-5'>
               <div className='w-full'>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vehicle ID</label>
-                <input
-                  type="number"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
-                  placeholder="Enter vehicle ID"
+                <SearchableSelect
+                  label="Vehicle"
+                  options={vehicles}
                   value={form.vehicleId}
-                  onChange={(e) => updateField('vehicleId', e.target.value)}
+                  onChange={(value) => updateField('vehicleId', value)}
+                  placeholder="Select vehicle"
+                  getOptionLabel={(vehicle) => `${vehicle.name} - ${vehicle.plateNumber}`}
                   required
                 />
               </div>
               <div className='w-full'>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Customer ID</label>
-                <input
-                  type="number"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
-                  placeholder="Enter customer ID"
+                <SearchableSelect
+                  label="Customer"
+                  options={customers}
                   value={form.customerId}
-                  onChange={(e) => updateField('customerId', e.target.value)}
+                  onChange={(value) => updateField('customerId', value)}
+                  placeholder="Select customer"
+                  getOptionLabel={(customer) => `${customer.name} (${customer.email})`}
                   required
+                />
+              </div>
+              <div className='w-full'>
+                <SearchableSelect
+                  label="Staff"
+                  options={staffList}
+                  value={form.staffId}
+                  onChange={(value) => updateField('staffId', value)}
+                  placeholder="Select staff"
+                  getOptionLabel={(staff) => `${staff.name}${staff.position ? ` - ${staff.position}` : ''}`}
                 />
               </div>
             </div>
@@ -397,12 +471,12 @@ const EditOrders = () => {
         </div>
 
         <div className="flex justify-end gap-2">
+          <Link to="/orders" className="btn btn-ghost">Cancel</Link>
           {canDelete && (
             <button type="button" className="btn btn-error" onClick={handleDelete} disabled={loading}>
               Delete Order
             </button>
           )}
-          <Link to="/orders" className="btn btn-ghost">Cancel</Link>
           <button type="submit" className="btn btn-primary" disabled={loading || cartItems.length === 0}>
             {loading ? 'Updating...' : 'Update Order'}
           </button>

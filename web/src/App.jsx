@@ -8,6 +8,7 @@ import ViewOrder from './components/pages/orders/viewOrders.jsx'
 import Services from './components/pages/services/services.jsx'
 import CreateServices from './components/pages/services/createServices.jsx'
 import Payments from './components/pages/payments.jsx'
+import OrderPayment from './components/pages/orders/orderPayment.jsx'
 import History from './components/pages/history.jsx'
 import Customers from './components/pages/customers/customers.jsx'
 import CreateCustomer from './components/pages/customers/createCustomer.jsx'
@@ -45,6 +46,7 @@ function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/services/create" element={<CreateServices />} />
           <Route path="/payments" element={<Payments />} />
+          <Route path="/payments/:orderId" element={<OrderPayment />} />
           <Route path="/history" element={<History />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/customers/create" element={<CreateCustomer />} />
