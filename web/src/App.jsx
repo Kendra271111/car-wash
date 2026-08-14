@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate, Outlet } from 'react-router'
 import Sidebar from './components/ui/sidebar.jsx'
 import Index from './components/index.jsx'
@@ -31,6 +32,23 @@ const GuestOnly = () => {
 }
 
 function App() {
+  const [themeReady, setThemeReady] = useState(false)
+
+  useEffect(() => {
+    const stored = localStorage.getItem('theme')
+    const isDark = stored === 'dark'
+    if (isDark) {
+      document.documentElement.setAttribute('data-theme', 'dark')
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light')
+      document.documentElement.classList.remove('dark')
+    }
+    setThemeReady(true)
+  }, [])
+
+  if (!themeReady) return null
+
   return (
     <Routes>
       <Route path="/login" element={<GuestOnly />}>

@@ -7,6 +7,8 @@ const Customers = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [search, setSearch] = useState('')
+  const [sortKey, setSortKey] = useState('id')
+  const [sortDirection, setSortDirection] = useState('asc')
 
   useEffect(() => {
     let cancelled = false
@@ -34,6 +36,42 @@ const Customers = () => {
       (c.email || '').toLowerCase().includes(q)
     )
   }, [customers, search])
+
+  const requestSort = (key) => {
+    let direction = 'asc'
+    if (sortKey === key && sortDirection === 'asc') {
+      direction = 'desc'
+    }
+    setSortKey(key)
+    setSortDirection(direction)
+  }
+
+  const getSortValue = (customer, key) => {
+    switch (key) {
+      case 'id':
+        return customer.id
+      case 'name':
+        return (customer.name || '').toLowerCase()
+      case 'email':
+        return (customer.email || '').toLowerCase()
+      case 'phone':
+        return (customer.phone || '').toLowerCase()
+      default:
+        return ''
+    }
+  }
+
+  const sorted = useMemo(() => {
+    const data = [...filtered]
+    data.sort((a, b) => {
+      const aValue = getSortValue(a, sortKey)
+      const bValue = getSortValue(b, sortKey)
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
+    return data
+  }, [filtered, sortKey, sortDirection])
 
   return (
     <div>
@@ -72,15 +110,23 @@ const Customers = () => {
             ) : (
               <table className="table">
                 <thead>
-                  <tr>
-                    <th></th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
+                <tr>
+                  <th className="cursor-pointer" onClick={() => requestSort('id')}>
+                    ID {sortKey === 'id' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  </th>
+                  <th className="cursor-pointer" onClick={() => requestSort('name')}>
+                      Name {sortKey === 'name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('email')}>
+                      Email {sortKey === 'email' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('phone')}>
+                      Phone {sortKey === 'phone' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((customer) => (
+                  {sorted.map((customer) => (
                     <tr key={customer.id}>
                       <td>{customer.id}</td>
                       <td>{customer.name}</td>

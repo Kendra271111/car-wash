@@ -7,6 +7,8 @@ const Staff = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [search, setSearch] = useState('')
+  const [sortKey, setSortKey] = useState('id')
+  const [sortDirection, setSortDirection] = useState('asc')
 
   useEffect(() => {
     let cancelled = false
@@ -34,6 +36,46 @@ const Staff = () => {
       (s.email || '').toLowerCase().includes(q)
     )
   }, [staff, search])
+
+  const requestSort = (key) => {
+    let direction = 'asc'
+    if (sortKey === key && sortDirection === 'asc') {
+      direction = 'desc'
+    }
+    setSortKey(key)
+    setSortDirection(direction)
+  }
+
+  const getSortValue = (member, key) => {
+    switch (key) {
+      case 'id':
+        return member.id
+      case 'name':
+        return (member.name || '').toLowerCase()
+      case 'email':
+        return (member.email || '').toLowerCase()
+      case 'phone':
+        return (member.phone || '').toLowerCase()
+      case 'position':
+        return (member.position || '').toLowerCase()
+      case 'status':
+        return member.isActive ? 'active' : 'inactive'
+      default:
+        return ''
+    }
+  }
+
+  const sorted = useMemo(() => {
+    const data = [...filtered]
+    data.sort((a, b) => {
+      const aValue = getSortValue(a, sortKey)
+      const bValue = getSortValue(b, sortKey)
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
+    return data
+  }, [filtered, sortKey, sortDirection])
 
   return (
     <div>
@@ -72,17 +114,29 @@ const Staff = () => {
             ) : (
               <table className="table">
                 <thead>
-                  <tr>
-                    <th></th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Position</th>
-                    <th>Status</th>
+                <tr>
+                  <th className="cursor-pointer" onClick={() => requestSort('id')}>
+                    ID {sortKey === 'id' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  </th>
+                  <th className="cursor-pointer" onClick={() => requestSort('name')}>
+                      Name {sortKey === 'name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('email')}>
+                      Email {sortKey === 'email' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('phone')}>
+                      Phone {sortKey === 'phone' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('position')}>
+                      Position {sortKey === 'position' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('status')}>
+                      Status {sortKey === 'status' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((member) => (
+                  {sorted.map((member) => (
                     <tr key={member.id}>
                       <td>{member.id}</td>
                       <td>{member.name}</td>

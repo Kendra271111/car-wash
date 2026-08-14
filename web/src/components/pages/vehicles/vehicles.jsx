@@ -7,6 +7,8 @@ const Vehicles = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [search, setSearch] = useState('')
+  const [sortKey, setSortKey] = useState('id')
+  const [sortDirection, setSortDirection] = useState('asc')
 
   useEffect(() => {
     let cancelled = false
@@ -36,6 +38,44 @@ const Vehicles = () => {
       (v.model || '').toLowerCase().includes(q)
     )
   }, [vehicles, search])
+
+  const requestSort = (key) => {
+    let direction = 'asc'
+    if (sortKey === key && sortDirection === 'asc') {
+      direction = 'desc'
+    }
+    setSortKey(key)
+    setSortDirection(direction)
+  }
+
+  const getSortValue = (vehicle, key) => {
+    switch (key) {
+      case 'id':
+        return vehicle.id
+      case 'name':
+        return (vehicle.name || '').toLowerCase()
+      case 'plateNumber':
+        return (vehicle.plateNumber || '').toLowerCase()
+      case 'brand':
+        return (vehicle.brand || '').toLowerCase()
+      case 'model':
+        return (vehicle.model || '').toLowerCase()
+      default:
+        return ''
+    }
+  }
+
+  const sorted = useMemo(() => {
+    const data = [...filtered]
+    data.sort((a, b) => {
+      const aValue = getSortValue(a, sortKey)
+      const bValue = getSortValue(b, sortKey)
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
+    return data
+  }, [filtered, sortKey, sortDirection])
 
   return (
     <div>
@@ -74,16 +114,26 @@ const Vehicles = () => {
             ) : (
               <table className="table">
                 <thead>
-                  <tr>
-                    <th></th>
-                    <th>Name</th>
-                    <th>Plate Number</th>
-                    <th>Brand</th>
-                    <th>Model</th>
+                <tr>
+                  <th className="cursor-pointer" onClick={() => requestSort('id')}>
+                    ID {sortKey === 'id' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  </th>
+                  <th className="cursor-pointer" onClick={() => requestSort('name')}>
+                      Name {sortKey === 'name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('plateNumber')}>
+                      Plate Number {sortKey === 'plateNumber' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('brand')}>
+                      Brand {sortKey === 'brand' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('model')}>
+                      Model {sortKey === 'model' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((vehicle) => (
+                  {sorted.map((vehicle) => (
                     <tr key={vehicle.id}>
                       <td>{vehicle.id}</td>
                       <td>{vehicle.name}</td>

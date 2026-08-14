@@ -10,8 +10,12 @@ export const getPaymentByOrderId = async (orderId) => {
   return res.data.data
 }
 
-export const fetchPayments = async (search = '') => {
-  const res = await api.get('/payments', search ? { params: { search } } : undefined)
+export const fetchPayments = async (search = '', { startDate, endDate } = {}) => {
+  const params = {}
+  if (search) params.search = search
+  if (startDate) params.startDate = startDate
+  if (endDate) params.endDate = endDate
+  const res = await api.get('/payments', { params })
   return res.data.data || []
 }
 

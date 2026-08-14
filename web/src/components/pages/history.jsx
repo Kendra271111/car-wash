@@ -13,6 +13,8 @@ const History = () => {
   const [search, setSearch] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [sortKey, setSortKey] = useState("id");
+  const [sortDirection, setSortDirection] = useState("asc");
 
   useEffect(() => {
     let cancelled = false;
@@ -70,6 +72,48 @@ const History = () => {
     return result;
   }, [completedOrders, filter, search]);
 
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortKey === key && sortDirection === "asc") {
+      direction = "desc";
+    }
+    setSortKey(key);
+    setSortDirection(direction);
+  };
+
+  const getSortValue = (order, key) => {
+    switch (key) {
+      case "id":
+        return order.id;
+      case "vehicle":
+        return order.vehicle ? `${order.vehicle.brand} ${order.vehicle.model}`.toLowerCase() : "";
+      case "customer":
+        return order.customer ? order.customer.name.toLowerCase() : "";
+      case "staff":
+        return order.staff ? order.staff.name.toLowerCase() : "";
+      case "services":
+        return order.order_items?.reduce((sum, item) => sum + (item.qty || 0), 0) || 0;
+      case "status":
+        return order.status || "PENDING";
+      case "created":
+        return order.createdAt ? new Date(order.createdAt).getTime() : 0;
+      default:
+        return "";
+    }
+  };
+
+  const sorted = useMemo(() => {
+    const data = [...filtered];
+    data.sort((a, b) => {
+      const aValue = getSortValue(a, sortKey);
+      const bValue = getSortValue(b, sortKey);
+      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+    return data;
+  }, [filtered, sortKey, sortDirection]);
+
   const dateRangeLabel = useMemo(() => {
     if (!startDate && !endDate) return "";
     if (startDate && endDate) return `${startDate} → ${endDate}`;
@@ -95,7 +139,7 @@ const History = () => {
   return (
     <div>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-row justify-between items-center">
+        <div className="flex flex-row justify-between">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
             Order History
           </h1>
@@ -110,53 +154,33 @@ const History = () => {
           </div>
         </div>
 
-        <div className="flex flex-row justify-between gap-2 items-center">
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-row gap-3 items-center">
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                Date range:
+        <div className="flex flex-row flex-wrap gap-2">
+          <div className="flex flex-row gap-2 items-center flex-wrap">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Date range:</span>
+            <button type="button" className="btn btn-ghost btn-xs" onClick={() => applyPreset(0)}>Today</button>
+            <button type="button" className="btn btn-ghost btn-xs" onClick={() => applyPreset(7)}>Last 7 days</button>
+            <button type="button" className="btn btn-ghost btn-xs" onClick={() => applyPreset(30)}>Last 30 days</button>
+            {dateRangeLabel && (
+              <span className="badge badge-primary badge-outline ml-2">
+                {dateRangeLabel}
               </span>
+            )}
+            {dateRangeLabel && (
               <button
                 type="button"
                 className="btn btn-ghost btn-xs"
-                onClick={() => applyPreset(0)}
+                onClick={clearDates}
               >
-                Today
+                Clear
               </button>
-              <button
-                type="button"
-                className="btn btn-ghost btn-xs"
-                onClick={() => applyPreset(7)}
-              >
-                Last 7 days
-              </button>
-              <button
-                type="button"
-                className="btn btn-ghost btn-xs"
-                onClick={() => applyPreset(30)}
-              >
-                Last 30 days
-              </button>
-              {dateRangeLabel && (
-                <span className="badge badge-primary badge-outline ml-2">
-                  {dateRangeLabel}
-                </span>
-              )}
-              {dateRangeLabel && (
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-xs"
-                  onClick={clearDates}
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-            <div className="flex flex-row gap-2 items-center">
+            )}
+          </div>
+        </div>
+        <div className="flex flex-row">
+          <div className="flex flex-row justify-between w-full">
+            <div className='flex flex-row gap-2 items-center'>
               <div className="flex flex-row gap-2 items-center">
-                <label className="text-sm text-gray-600 dark:text-gray-300">
-                  From:
-                </label>
+                <label className="text-sm text-gray-600 dark:text-gray-300">From:</label>
                 <input
                   type="date"
                   className="input input-bordered input-sm"
@@ -165,9 +189,7 @@ const History = () => {
                 />
               </div>
               <div className="flex flex-row gap-2 items-center">
-                <label className="text-sm text-gray-600 dark:text-gray-300">
-                  To:
-                </label>
+                <label className="text-sm text-gray-600 dark:text-gray-300">To:</label>
                 <input
                   type="date"
                   className="input input-bordered input-sm"
@@ -176,16 +198,15 @@ const History = () => {
                 />
               </div>
             </div>
+            <input
+              type="text"
+              className="input input-bordered input-sm w-64"
+              placeholder="Search history..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
-          <input
-            type="text"
-            className="input input-bordered input-sm w-full mt-5 ml-5"
-            placeholder="Search history..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
         </div>
-
         <div className="flex flex-row gap-2 overflow-x-auto pb-1">
           <button
             className={`btn btn-ghost btn-sm ${filter === "all" ? "btn-active" : ""}`}
@@ -226,19 +247,33 @@ const History = () => {
             ) : (
               <table className="table">
                 <thead>
-                  <tr>
-                    <th></th>
-                    <th>Vehicle</th>
-                    <th>Customer</th>
-                    <th>Staff</th>
-                    <th>Services</th>
-                    <th>Status</th>
-                    <th>Created</th>
+                <tr>
+                  <th className="cursor-pointer" onClick={() => requestSort('id')}>
+                    ID {sortKey === 'id' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  </th>
+                  <th className="cursor-pointer" onClick={() => requestSort('vehicle')}>
+                      Vehicle {sortKey === 'vehicle' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('customer')}>
+                      Customer {sortKey === 'customer' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('staff')}>
+                      Staff {sortKey === 'staff' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('services')}>
+                      Services {sortKey === 'services' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('status')}>
+                      Status {sortKey === 'status' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('created')}>
+                      Created {sortKey === 'created' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
                     <th className="text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((order) => {
+                  {sorted.map((order) => {
                     const status = order.status || "PENDING";
                     return (
                       <tr key={order.id}>

@@ -70,7 +70,7 @@ export const getPaymentByOrderId = async (req: Request, res: Response, next: Nex
 
 export const getAllPayments = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { search, method, status } = req.query;
+    const { search, method, status, startDate, endDate } = req.query;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -88,6 +88,12 @@ export const getAllPayments = async (req: Request, res: Response, next: NextFunc
     }
     if (status) {
       where.status = status as string;
+    }
+    if (startDate || endDate) {
+      const createdAt: any = {};
+      if (startDate) createdAt.gte = new Date(startDate as string)
+      if (endDate) createdAt.lte = new Date(endDate as string)
+      where.createdAt = createdAt
     }
 
     const [payments, total] = await Promise.all([
@@ -113,7 +119,7 @@ export const getAllPayments = async (req: Request, res: Response, next: NextFunc
       message: 'Payments retrieved successfully',
       meta: {
         current_page: page,
-        limit,
+        limit: limit,
         total_data: total,
         total_pages: Math.ceil(total / limit),
       },

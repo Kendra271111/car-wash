@@ -49,13 +49,8 @@ const OrderHeader = ({ title, subtitle, backHref }) => (
   </div>
 );
 
-const OrderMeta = ({ order, payment }) => {
+const OrderMeta = ({ order }) => {
   const status = order?.status || "PENDING";
-  const totalAmount = (order?.order_items || []).reduce(
-    (sum, item) => sum + Number(item.subtotal || 0),
-    0
-  );
-  const isPaid = payment?.status === "PAID";
 
   return (
     <>
@@ -214,7 +209,7 @@ const OrderInfoCards = ({ order, payment, status }) => (
   </div>
 );
 
-const OrderActions = ({ order, payment, onComplete, completing }) => {
+const OrderActions = ({ order, payment, onComplete, completing, onPrint }) => {
   const status = order?.status || "PENDING";
   const isPaid = payment?.status === "PAID";
   const showPaymentBtn = status !== "COMPLETED" || !isPaid;
@@ -240,7 +235,148 @@ const OrderActions = ({ order, payment, onComplete, completing }) => {
           </Link>
         )}
       </div>
-      <button className="btn btn-ghost">Print Service Ticket</button>
+      <button className="btn btn-ghost" onClick={onPrint}>Print Service Ticket</button>
+    </div>
+  );
+};
+
+const InvoiceModal = ({ order, payment, onClose }) => {
+  if (!order || !onClose) return null;
+  const status = order.status || "PENDING";
+  const totalAmount = (order.order_items || []).reduce((sum, item) => sum + Number(item.subtotal || 0), 0);
+  const isPaid = payment?.status === "PAID";
+  const serviceCount = (order.order_items || []).reduce((sum, item) => sum + (item.qty || 0), 0);
+  const totalDuration = (order.order_items || []).reduce((sum, item) => sum + (item.duration || 0), 0);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/70" onClick={onClose} />
+      <div className="relative bg-white dark:bg-gray-900 w-full max-w-xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+        <div className="p-8">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">CAR WASH</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Service Ticket</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">Order #{order.id}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(order.createdAt)}</p>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Customer</p>
+                {order.customer ? (
+                  <div className="flex flex-col gap-0.5">
+                    <p className="font-medium text-gray-900 dark:text-white">{order.customer.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{order.customer.email}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{order.customer.phone}</p>
+                  </div>
+                ) : (
+                  <p className="text-gray-400">Customer #{order.customerId}</p>
+                )}
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Vehicle</p>
+                {order.vehicle ? (
+                  <div className="flex flex-col gap-0.5">
+                    <p className="font-medium text-gray-900 dark:text-white">{order.vehicle.brand} {order.vehicle.model}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{order.vehicle.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{order.vehicle.plateNumber}</p>
+                  </div>
+                ) : (
+                  <p className="text-gray-400">Vehicle #{order.vehicleId}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
+            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Service Details</p>
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service</th>
+                  <th className="text-center py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Qty</th>
+                  <th className="text-center py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Duration</th>
+                  <th className="text-right py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price</th>
+                  <th className="text-right py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(order.order_items || []).map((item) => (
+                  <tr key={item.id} className="border-b border-gray-100 dark:border-gray-800 last:border-0">
+                    <td className="py-3 text-sm text-gray-900 dark:text-white">{item.service?.name || `Service #${item.serviceId}`}</td>
+                    <td className="py-3 text-sm text-center text-gray-600 dark:text-gray-300">{item.qty}</td>
+                    <td className="py-3 text-sm text-center text-gray-600 dark:text-gray-300">{item.duration} min</td>
+                    <td className="py-3 text-sm text-right text-gray-600 dark:text-gray-300">${Number(item.price).toFixed(2)}</td>
+                    <td className="py-3 text-sm text-right font-medium text-gray-900 dark:text-white">${Number(item.subtotal).toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Total Services</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">{serviceCount} service(s)</span>
+            </div>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Total Duration</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">{totalDuration} min</span>
+            </div>
+            <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
+              <span className="text-base font-semibold text-gray-900 dark:text-white">Total</span>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">${totalAmount.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Status</p>
+                <span className={`badge ${statusColors[status] || 'badge-neutral'}`}>
+                  {statusLabels[status] || status}
+                </span>
+              </div>
+              <div className="text-right">
+                <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Payment</p>
+                {payment ? (
+                  <div className="flex flex-col gap-1 items-end">
+                    <span className={`badge ${isPaid ? 'badge-success' : 'badge-warning'}`}>{payment.status}</span>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{payment.method}</p>
+                    {isPaid && (
+                      <>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">Paid: ${Number(payment.amount).toFixed(2)}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">Change: ${Number(payment.change).toFixed(2)}</p>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400">Unpaid</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {order.note && (
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
+              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Notes</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{order.note}</p>
+            </div>
+          )}
+
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 flex justify-between items-center">
+            <p className="text-xs text-gray-400 dark:text-gray-500">Staff: {order.staff?.name || `Staff #${order.staffId}`}</p>
+            <div className="flex gap-2">
+              <button className="btn btn-ghost btn-sm" onClick={onClose}>Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -253,6 +389,7 @@ const ViewOrder = () => {
   const [order, setOrder] = useState(null);
   const [completing, setCompleting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showInvoice, setShowInvoice] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -354,7 +491,16 @@ const ViewOrder = () => {
         payment={payment}
         onComplete={handleMarkAsCompleted}
         completing={completing}
+        onPrint={() => setShowInvoice(true)}
       />
+      {showInvoice && order && (
+        <InvoiceModal
+          key="invoice-modal"
+          order={order}
+          payment={payment}
+          onClose={() => setShowInvoice(false)}
+        />
+      )}
     </div>
   );
 };

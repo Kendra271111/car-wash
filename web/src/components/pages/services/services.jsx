@@ -7,6 +7,8 @@ const Services = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [search, setSearch] = useState('')
+  const [sortKey, setSortKey] = useState('id')
+  const [sortDirection, setSortDirection] = useState('asc')
 
   useEffect(() => {
     let cancelled = false
@@ -31,6 +33,42 @@ const Services = () => {
     const q = search.toLowerCase()
     return services.filter((s) => (s.name || '').toLowerCase().includes(q))
   }, [services, search])
+
+  const requestSort = (key) => {
+    let direction = 'asc'
+    if (sortKey === key && sortDirection === 'asc') {
+      direction = 'desc'
+    }
+    setSortKey(key)
+    setSortDirection(direction)
+  }
+
+  const getSortValue = (service, key) => {
+    switch (key) {
+      case 'id':
+        return service.id
+      case 'name':
+        return (service.name || '').toLowerCase()
+      case 'duration':
+        return Number(service.duration || 0)
+      case 'price':
+        return Number(service.price || 0)
+      default:
+        return ''
+    }
+  }
+
+  const sorted = useMemo(() => {
+    const data = [...filtered]
+    data.sort((a, b) => {
+      const aValue = getSortValue(a, sortKey)
+      const bValue = getSortValue(b, sortKey)
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
+    return data
+  }, [filtered, sortKey, sortDirection])
 
   return (
     <div>
@@ -69,15 +107,23 @@ const Services = () => {
             ) : (
               <table className="table">
                 <thead>
-                  <tr>
-                    <th></th>
-                    <th>Name</th>
-                    <th>Duration (min)</th>
-                    <th>Price</th>
+                <tr>
+                  <th className="cursor-pointer" onClick={() => requestSort('id')}>
+                    ID {sortKey === 'id' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  </th>
+                  <th className="cursor-pointer" onClick={() => requestSort('name')}>
+                      Name {sortKey === 'name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('duration')}>
+                      Duration (min) {sortKey === 'duration' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('price')}>
+                      Price {sortKey === 'price' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((service) => (
+                  {sorted.map((service) => (
                     <tr key={service.id}>
                       <td>{service.id}</td>
                       <td>{service.name}</td>

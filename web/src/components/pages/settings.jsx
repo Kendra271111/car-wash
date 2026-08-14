@@ -1,9 +1,25 @@
+import { useEffect, useState } from 'react'
 
 const Settings = () => {
   const user = (() => {
     const stored = localStorage.getItem('user')
     return stored ? JSON.parse(stored) : null
   })()
+
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark'
+  })
+
+  useEffect(() => {
+    const theme = darkMode ? 'dark' : 'light'
+    document.documentElement.setAttribute('data-theme', theme)
+    document.documentElement.classList.toggle('dark', darkMode)
+    localStorage.setItem('theme', theme)
+  }, [darkMode])
+
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => !prev)
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -22,7 +38,12 @@ const Settings = () => {
         )}
         <div className="flex flex-row justify-between items-center">
           <span className="text-gray-700 dark:text-gray-300">Enable Dark Mode</span>
-          <input type="checkbox" className="toggle toggle-primary" />
+          <input
+            type="checkbox"
+            className="toggle toggle-primary"
+            checked={darkMode}
+            onChange={toggleDarkMode}
+          />
         </div>
         <div className="flex flex-row justify-between items-center">
           <span className="text-gray-700 dark:text-gray-300">Enable Notifications</span>

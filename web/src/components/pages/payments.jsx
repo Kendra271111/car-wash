@@ -8,6 +8,10 @@ const Payments = () => {
   const [error, setError] = useState(null)
   const [refetchKey, setRefetchKey] = useState(0)
   const [search, setSearch] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [sortKey, setSortKey] = useState('id')
+  const [sortDirection, setSortDirection] = useState('asc')
 
   useEffect(() => {
     let cancelled = false
@@ -15,7 +19,7 @@ const Payments = () => {
       setLoading(true)
       setError(null)
       try {
-        const data = await paymentController.fetchPayments(search)
+        const data = await paymentController.fetchPayments(search, { startDate, endDate })
         if (!cancelled) setPayments(data)
       } catch (err) {
         if (!cancelled) setError(err.response?.data?.message || 'Failed to load payments.')
@@ -25,17 +29,100 @@ const Payments = () => {
     }
     loadPayments()
     return () => { cancelled = true }
-  }, [refetchKey, search])
+  }, [refetchKey, search, startDate, endDate])
 
   const filtered = useMemo(() => {
-    if (!search) return payments
-    const q = search.toLowerCase()
-    return payments.filter((p) =>
-      (p.order?.customer?.name || '').toLowerCase().includes(q) ||
-      (p.method || '').toLowerCase().includes(q) ||
-      (p.status || '').toLowerCase().includes(q)
-    )
-  }, [payments, search])
+    let result = payments
+    if (search) {
+      const q = search.toLowerCase()
+      result = result.filter((p) =>
+        (p.order?.customer?.name || '').toLowerCase().includes(q) ||
+        (p.method || '').toLowerCase().includes(q) ||
+        (p.status || '').toLowerCase().includes(q)
+      )
+    }
+    if (startDate && result.length > 0) {
+      result = result.filter((p) => {
+        if (!p.createdAt) return false
+        const paymentDate = new Date(p.createdAt).toISOString().split('T')[0]
+        return paymentDate >= startDate
+      })
+    }
+    if (endDate && result.length > 0) {
+      result = result.filter((p) => {
+        if (!p.createdAt) return false
+        const paymentDate = new Date(p.createdAt).toISOString().split('T')[0]
+        return paymentDate <= endDate
+      })
+    }
+    return result
+  }, [payments, search, startDate, endDate])
+
+  const requestSort = (key) => {
+    let direction = 'asc'
+    if (sortKey === key && sortDirection === 'asc') {
+      direction = 'desc'
+    }
+    setSortKey(key)
+    setSortDirection(direction)
+  }
+
+  const getSortValue = (payment, key) => {
+    switch (key) {
+      case 'id':
+        return payment.id
+      case 'orderId':
+        return payment.orderId
+      case 'customer':
+        return payment.order?.customer?.name ? payment.order.customer.name.toLowerCase() : ''
+      case 'vehicle':
+        return payment.order?.vehicle ? `${payment.order.vehicle.brand} ${payment.order.vehicle.model}`.toLowerCase() : ''
+      case 'method':
+        return (payment.method || '').toLowerCase()
+      case 'amount':
+        return Number(payment.amount || 0)
+      case 'change':
+        return Number(payment.change || 0)
+      case 'status':
+        return (payment.status || '').toLowerCase()
+      case 'created':
+        return payment.createdAt ? new Date(payment.createdAt).getTime() : 0
+      default:
+        return ''
+    }
+  }
+
+  const sorted = useMemo(() => {
+    const data = [...filtered]
+    data.sort((a, b) => {
+      const aValue = getSortValue(a, sortKey)
+      const bValue = getSortValue(b, sortKey)
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
+    return data
+  }, [filtered, sortKey, sortDirection])
+
+  const dateRangeLabel = useMemo(() => {
+    if (!startDate && !endDate) return ''
+    if (startDate && endDate) return `${startDate} → ${endDate}`
+    if (startDate) return `From ${startDate}`
+    return `Until ${endDate}`
+  }, [startDate, endDate])
+
+  const clearDates = () => {
+    setStartDate('')
+    setEndDate('')
+  }
+
+  const applyPreset = (days) => {
+    const end = new Date()
+    const start = new Date()
+    start.setDate(end.getDate() - days)
+    setStartDate(start.toISOString().split('T')[0])
+    setEndDate(end.toISOString().split('T')[0])
+  }
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-US', {
@@ -67,18 +154,50 @@ const Payments = () => {
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Payments</h1>
-          <div className="flex flex-row gap-2">
-            <input
-              type="text"
-              className="input input-bordered input-sm w-64"
-              placeholder="Search payments..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <button className="btn btn-ghost btn-sm" onClick={() => setRefetchKey((k) => k + 1)}>
-              <span className="material-symbols-outlined mr-1">refresh</span>
-              Refresh
-            </button>
+          <div className="flex flex-col gap-2 items-end">
+            <div className="flex flex-row gap-2 items-center">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Date range:</span>
+              <button type="button" className="btn btn-ghost btn-xs" onClick={() => applyPreset(0)}>Today</button>
+              <button type="button" className="btn btn-ghost btn-xs" onClick={() => applyPreset(7)}>Last 7 days</button>
+              <button type="button" className="btn btn-ghost btn-xs" onClick={() => applyPreset(30)}>Last 30 days</button>
+              {dateRangeLabel && (
+                <span className="badge badge-primary badge-outline ml-2">{dateRangeLabel}</span>
+              )}
+              {dateRangeLabel && (
+                <button type="button" className="btn btn-ghost btn-xs" onClick={clearDates}>Clear</button>
+              )}
+            </div>
+            <div className="flex flex-row gap-2 items-center">
+              <div className="flex flex-row gap-2 items-center">
+                <label className="text-sm text-gray-600 dark:text-gray-300">From:</label>
+                <input
+                  type="date"
+                  className="input input-bordered input-sm"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-row gap-2 items-center">
+                <label className="text-sm text-gray-600 dark:text-gray-300">To:</label>
+                <input
+                  type="date"
+                  className="input input-bordered input-sm"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </div>
+              <input
+                type="text"
+                className="input input-bordered input-sm w-64"
+                placeholder="Search payments..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <button className="btn btn-ghost btn-sm" onClick={() => setRefetchKey((k) => k + 1)}>
+                <span className="material-symbols-outlined mr-1">refresh</span>
+                Refresh
+              </button>
+            </div>
           </div>
         </div>
 
@@ -100,19 +219,38 @@ const Payments = () => {
             ) : (
               <table className="table">
                 <thead>
-                  <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Vehicle</th>
-                    <th>Method</th>
-                    <th>Amount</th>
-                    <th>Change</th>
-                    <th>Status</th>
-                    <th>Date</th>
+                <tr>
+                  <th className="cursor-pointer" onClick={() => requestSort('id')}>
+                    ID {sortKey === 'id' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  </th>
+                  <th className="cursor-pointer" onClick={() => requestSort('orderId')}>
+                      Order ID {sortKey === 'orderId' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('customer')}>
+                      Customer {sortKey === 'customer' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('vehicle')}>
+                      Vehicle {sortKey === 'vehicle' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('method')}>
+                      Method {sortKey === 'method' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('amount')}>
+                      Amount {sortKey === 'amount' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('change')}>
+                      Change {sortKey === 'change' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('status')}>
+                      Status {sortKey === 'status' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th className="cursor-pointer" onClick={() => requestSort('created')}>
+                      Date {sortKey === 'created' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((payment) => (
+                  {sorted.map((payment) => (
                     <tr key={payment.id}>
                       <td>#{payment.orderId}</td>
                       <td>

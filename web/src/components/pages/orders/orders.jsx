@@ -97,6 +97,8 @@ const Orders = () => {
   const [search, setSearch] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+  const [sortKey, setSortKey] = useState('id')
+  const [sortDirection, setSortDirection] = useState('asc')
 
   useEffect(() => {
     let cancelled = false
@@ -134,6 +136,48 @@ const Orders = () => {
   const totalCount = activeOrders.length
 
   const filtered = filter === 'all' ? activeOrders : activeOrders.filter((o) => (o.status || 'PENDING') === filter)
+
+  const requestSort = (key) => {
+    let direction = 'asc'
+    if (sortKey === key && sortDirection === 'asc') {
+      direction = 'desc'
+    }
+    setSortKey(key)
+    setSortDirection(direction)
+  }
+
+  const getSortValue = (order, key) => {
+    switch (key) {
+      case 'id':
+        return order.id
+      case 'vehicle':
+        return order.vehicle ? `${order.vehicle.brand} ${order.vehicle.model}`.toLowerCase() : ''
+      case 'customer':
+        return order.customer ? order.customer.name.toLowerCase() : ''
+      case 'staff':
+        return order.staff ? order.staff.name.toLowerCase() : ''
+      case 'services':
+        return order.order_items?.reduce((sum, item) => sum + (item.qty || 0), 0) || 0
+      case 'status':
+        return order.status || 'PENDING'
+      case 'created':
+        return order.createdAt ? new Date(order.createdAt).getTime() : 0
+      default:
+        return ''
+    }
+  }
+
+  const sorted = useMemo(() => {
+    const data = [...filtered]
+    data.sort((a, b) => {
+      const aValue = getSortValue(a, sortKey)
+      const bValue = getSortValue(b, sortKey)
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
+    return data
+  }, [filtered, sortKey, sortDirection])
 
   const dateRangeLabel = useMemo(() => {
     if (!startDate && !endDate) return ''
@@ -253,18 +297,32 @@ const Orders = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th></th>
-                  <th>Vehicle</th>
-                  <th>Customer</th>
-                  <th>Staff</th>
-                  <th>Services</th>
-                  <th>Status</th>
-                  <th>Created</th>
+                  <th className="cursor-pointer" onClick={() => requestSort('id')}>
+                    ID {sortKey === 'id' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  </th>
+                  <th className="cursor-pointer" onClick={() => requestSort('vehicle')}>
+                    Vehicle {sortKey === 'vehicle' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  </th>
+                  <th className="cursor-pointer" onClick={() => requestSort('customer')}>
+                    Customer {sortKey === 'customer' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  </th>
+                  <th className="cursor-pointer" onClick={() => requestSort('staff')}>
+                    Staff {sortKey === 'staff' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  </th>
+                  <th className="cursor-pointer" onClick={() => requestSort('services')}>
+                    Services {sortKey === 'services' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  </th>
+                  <th className="cursor-pointer" onClick={() => requestSort('status')}>
+                    Status {sortKey === 'status' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  </th>
+                  <th className="cursor-pointer" onClick={() => requestSort('created')}>
+                    Created {sortKey === 'created' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  </th>
                   <th className="text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((order) => (
+                {sorted.map((order) => (
                   <OrderRow key={order.id} order={order} />
                 ))}
               </tbody>
