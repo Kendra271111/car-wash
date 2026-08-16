@@ -80,7 +80,7 @@ const OrderPayment = () => {
         </div>
         <div className="card bg-white dark:bg-gray-950 p-4 rounded-lg shadow-md">
           <div className="p-8 text-center">
-            <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+            <span className="loading loading-spinner loading-lg text-teal-600"></span>
           </div>
         </div>
       </div>
@@ -232,7 +232,7 @@ const OrderPayment = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Amount Received</label>
               <input
                 type="number"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 placeholder="Enter amount received"
                 value={amountReceived}
                 onChange={(e) => setAmountReceived(e.target.value)}
@@ -251,7 +251,7 @@ const OrderPayment = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes (optional)</label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 placeholder="Add payment notes..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

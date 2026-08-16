@@ -235,7 +235,7 @@ const EditOrders = () => {
         </div>
         <div className="card bg-white dark:bg-gray-950 p-4 rounded-lg shadow-md">
           <div className="p-8 text-center">
-            <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+            <span className="loading loading-spinner loading-lg text-teal-600"></span>
           </div>
         </div>
       </div>
@@ -310,7 +310,7 @@ const EditOrders = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
               <select
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 value={form.status}
                 onChange={(e) => updateField('status', e.target.value)}
               >
@@ -338,7 +338,7 @@ const EditOrders = () => {
 
           {fetchingServices ? (
             <div className="p-8 text-center">
-              <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+              <span className="loading loading-spinner loading-lg text-teal-600"></span>
             </div>
           ) : (
             <div className="overflow-x-auto max-h-64 overflow-y-auto">
@@ -366,7 +366,7 @@ const EditOrders = () => {
                         <td>
                           {item.empty ? (
                             <select
-                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                               value=""
                               onChange={(e) => {
                                 const service = services.find((s) => s.id === Number(e.target.value))
@@ -438,7 +438,7 @@ const EditOrders = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes (optional)</label>
             <input
               type='text'
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
               value={form.note}
               onChange={(e) => updateField('note', e.target.value)}
               placeholder='Add any notes for this order...'

@@ -55,7 +55,7 @@ const CreateStaff = () => {
         </div>
         <Link to="/staff" className="btn btn-ghost">
           <span className="material-symbols-outlined mr-1">arrow_back</span>
-          Back to Staff
+          Back to Staffs
         </Link>
       </div>
 
@@ -80,7 +80,7 @@ const CreateStaff = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 placeholder="Enter staff name"
                 value={form.name}
                 onChange={(e) => updateField('name', e.target.value)}
@@ -91,7 +91,7 @@ const CreateStaff = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
               <input
                 type="email"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 placeholder="Enter email"
                 value={form.email}
                 onChange={(e) => updateField('email', e.target.value)}
@@ -104,7 +104,7 @@ const CreateStaff = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 placeholder="Enter phone number"
                 value={form.phone}
                 onChange={(e) => updateField('phone', e.target.value)}
@@ -114,7 +114,7 @@ const CreateStaff = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Position</label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 placeholder="Enter position"
                 value={form.position}
                 onChange={(e) => updateField('position', e.target.value)}
@@ -124,7 +124,7 @@ const CreateStaff = () => {
           <div className='w-full'>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
             <select
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
               value={String(form.isActive)}
               onChange={(e) => updateField('isActive', e.target.value === 'true')}
             >

@@ -73,7 +73,7 @@ const CreateVehicle = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vehicle Name</label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 placeholder="Enter vehicle name"
                 value={form.name}
                 onChange={(e) => updateField('name', e.target.value)}
@@ -84,7 +84,7 @@ const CreateVehicle = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Plate Number</label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 placeholder="Enter plate number"
                 value={form.plateNumber}
                 onChange={(e) => updateField('plateNumber', e.target.value)}
@@ -97,7 +97,7 @@ const CreateVehicle = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Brand</label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 placeholder="Enter brand"
                 value={form.brand}
                 onChange={(e) => updateField('brand', e.target.value)}
@@ -108,7 +108,7 @@ const CreateVehicle = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Model</label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 placeholder="Enter model"
                 value={form.model}
                 onChange={(e) => updateField('model', e.target.value)}

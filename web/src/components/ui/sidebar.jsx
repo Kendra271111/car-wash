@@ -6,7 +6,7 @@ const navItems = [
   { href: '/dashboard', label: 'Home', icon: 'home' },
   { href: '/orders', label: 'Orders', icon: 'local_car_wash' },
   { href: '/customers', label: 'Customers', icon: 'people' },
-  { href: '/staff', label: 'Staff', icon: 'badge' },
+  { href: '/staff', label: 'Staffs', icon: 'badge' },
   { href: '/vehicles', label: 'Vehicles', icon: 'directions_car' },
   { href: '/services', label: 'Services', icon: 'handyman' },
   { href: '/history', label: 'Order History', icon: 'restore' },
@@ -34,7 +34,7 @@ const Sidebar = () => {
   const linkClasses = (href) => {
     const base = 'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 border-l-4'
     if (isActive(href)) {
-      return `${base} bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400 border-indigo-600`
+      return `${base} bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400 border-teal-600`
     }
     return `${base} text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800/60 border-transparent`
   }
@@ -45,17 +45,22 @@ const Sidebar = () => {
         <div className={`fixed inset-y-0 left-0 bg-white border-r border-gray-200 dark:border-gray-800 dark:bg-gray-950 transition-all duration-300 ease-in-out shadow-sm z-50 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 ${collapsed ? 'w-16' : 'w-64'}`}>
           <div className="flex items-center h-16 px-4 border-b border-gray-200 dark:border-gray-800">
             {!collapsed ? (
-              <div className="flex items-center gap-3 flex-1">
-                <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm">
+              <Link to="/dashboard" className="flex items-center gap-3 flex-1 group">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center text-white shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
                   <span className="material-symbols-outlined text-xl">directions_car</span>
                 </div>
-                <span className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">WASHINGTON</span>
-              </div>
+                <div className="flex flex-col">
+                  <span className="text-lg font-bold text-gray-900 dark:text-white tracking-tight leading-tight">WASHINGTON</span>
+                  <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-tight">Car Wash</span>
+                </div>
+              </Link>
             ) : (
               <div className="flex-1 flex justify-center">
-                <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm">
-                  <span className="material-symbols-outlined text-xl">directions_car</span>
-                </div>
+                <Link to="/dashboard" className="group">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center text-white shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-200">
+                    <span className="material-symbols-outlined text-xl">directions_car</span>
+                  </div>
+                </Link>
               </div>
             )}
             <div className="flex items-center">

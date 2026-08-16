@@ -136,7 +136,7 @@ const CreateOrders = () => {
         </div>
         <div className="card bg-white dark:bg-gray-950 p-4 rounded-lg shadow-md">
           <div className="p-8 text-center">
-            <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+            <span className="loading loading-spinner loading-lg text-teal-600"></span>
           </div>
         </div>
       </div>
@@ -225,7 +225,7 @@ const CreateOrders = () => {
                 Status
               </label>
               <select
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 value={form.status}
                 onChange={(e) => updateField("status", e.target.value)}
               >
@@ -255,7 +255,7 @@ const CreateOrders = () => {
 
           {initialLoading ? (
             <div className="p-8 text-center">
-              <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+              <span className="loading loading-spinner loading-lg text-teal-600"></span>
             </div>
           ) : (
             <div className="overflow-x-auto max-h-64 overflow-y-auto border-b border-gray-200 dark:border-gray-700">
@@ -281,36 +281,44 @@ const CreateOrders = () => {
                       </td>
                     </tr>
                   ) : (
-                    cartItems.map((item, index) => (
-                      <tr key={index}>
-                        <td>
-                          {item.empty ? (
-                            <select
-                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
-                              value=""
-                              onChange={(e) => {
-                                const service = options.services.find(
-                                  (s) => s.id === Number(e.target.value),
-                                );
-                                if (service) {
-                                  selectService(index, service);
-                                }
-                              }}
-                              autoFocus
-                            >
-                              <option value="" disabled>
-                                Select a service...
-                              </option>
-                              {options.services?.map((service) => (
-                                <option key={service.id} value={service.id}>
-                                  {service.name}
+                    cartItems.map((item, index) => {
+                      const selectedServiceIds = cartItems
+                        .filter((i) => !i.empty && i.serviceId && i !== item)
+                        .map((i) => i.serviceId);
+
+                      return (
+                        <tr key={index}>
+                          <td>
+                            {item.empty ? (
+                              <select
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
+                                value=""
+                                onChange={(e) => {
+                                  const service = options.services.find(
+                                    (s) => s.id === Number(e.target.value),
+                                  );
+                                  if (service) {
+                                    selectService(index, service);
+                                  }
+                                }}
+                                autoFocus
+                              >
+                                <option value="" disabled>
+                                  Select a service...
                                 </option>
-                              ))}
-                            </select>
-                          ) : (
-                            <span className="font-medium">{item.service}</span>
-                          )}
-                        </td>
+                                {options.services?.map((service) => {
+                                  const isSelected = selectedServiceIds.includes(service.id);
+                                  return (
+                                    <option key={service.id} value={service.id} disabled={isSelected}>
+                                      {service.name} {isSelected ? '(already added)' : ''}
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                            ) : (
+                              <span className="font-medium">{item.service}</span>
+                            )}
+                          </td>
                         <td>{item.empty ? "-" : item.duration}</td>
                         <td>{item.empty ? "-" : item.price.toFixed(2)}</td>
                         <td>
@@ -365,8 +373,8 @@ const CreateOrders = () => {
                           </button>
                         </td>
                       </tr>
-                    ))
-                  )}
+                    )}
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -378,7 +386,7 @@ const CreateOrders = () => {
             </label>
             <input
               type="text"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
               value={form.note}
               onChange={(e) => updateField("note", e.target.value)}
               placeholder="Add any notes for this order..."

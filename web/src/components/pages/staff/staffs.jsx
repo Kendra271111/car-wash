@@ -9,13 +9,13 @@ const SortIndicator = ({ active, direction }) => {
     )
   }
   return (
-    <span className="text-indigo-600 dark:text-indigo-400 text-xs ml-1">
+    <span className="text-teal-600 dark:text-teal-400 text-xs ml-1">
       {direction === 'asc' ? '↑' : '↓'}
     </span>
   )
 }
 
-const Staff = () => {
+const Staffs = () => {
   const [staff, setStaff] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -94,12 +94,12 @@ const Staff = () => {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between items-center">
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Staff</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Staffs</h1>
           <div className="flex flex-row gap-2">
             <input
               type="text"
               className="input input-bordered input-sm w-64"
-              placeholder="Search staff..."
+              placeholder="Search staffs..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -120,13 +120,13 @@ const Staff = () => {
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-12 text-center">
-              <span className="loading loading-spinner loading-lg text-indigo-600"></span>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Loading staff...</p>
+              <span className="loading loading-spinner loading-lg text-teal-600"></span>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Loading staffs...</p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="p-12 text-center">
               <span className="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600 mb-3">badge</span>
-              <p className="text-gray-500 dark:text-gray-400">No staff found.</p>
+              <p className="text-gray-500 dark:text-gray-400">No staffs found.</p>
             </div>
           ) : (
             <table className="table table-zebra">
@@ -176,4 +176,4 @@ const Staff = () => {
   )
 }
 
-export default Staff
+export default Staffs

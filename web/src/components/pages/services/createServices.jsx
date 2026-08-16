@@ -75,7 +75,7 @@ const CreateServices = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service Name</label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 placeholder="Enter service name"
                 value={form.name}
                 onChange={(e) => updateField('name', e.target.value)}
@@ -86,7 +86,7 @@ const CreateServices = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Duration (min)</label>
               <input
                 type="number"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 placeholder="Enter duration"
                 value={form.duration}
                 onChange={(e) => updateField('duration', e.target.value)}
@@ -97,7 +97,7 @@ const CreateServices = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price</label>
               <input
                 type="number"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white"
                 placeholder="Enter price"
                 value={form.price}
                 onChange={(e) => updateField('price', e.target.value)}

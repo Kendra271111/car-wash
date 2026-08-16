@@ -58,7 +58,7 @@ const Dashboard = () => {
     { label: 'Total Orders', value: stats.totalOrders, desc: 'All time orders', icon: 'local_car_wash', color: 'from-blue-500 to-blue-600' },
     { label: 'Total Users', value: stats.totalUsers, desc: 'Registered users', icon: 'people', color: 'from-emerald-500 to-emerald-600' },
     { label: 'Pending', value: stats.pending, desc: 'Orders waiting to be processed', icon: 'schedule', color: 'from-amber-500 to-amber-600' },
-    { label: 'Completed', value: stats.completed, desc: 'Orders completed successfully', icon: 'check_circle', color: 'from-indigo-500 to-indigo-600' },
+    { label: 'Completed', value: stats.completed, desc: 'Orders completed successfully', icon: 'check_circle', color: 'from-teal-500 to-teal-600' },
   ]
 
   return (
@@ -138,12 +138,12 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="card bg-gradient-to-br from-indigo-500 to-indigo-700 p-6 rounded-xl shadow-md text-white">
+        <div className="card bg-gradient-to-br from-teal-500 to-teal-700 p-6 rounded-xl shadow-md text-white">
           <h2 className="text-lg font-semibold mb-2">Need Help?</h2>
-          <p className="text-indigo-100 text-sm mb-4">
+          <p className="text-teal-100 text-sm mb-4">
             Use the sidebar to navigate orders, customers, vehicles, services, and more.
           </p>
-          <a href="/orders" className="inline-flex items-center gap-1 text-sm font-medium text-white hover:text-indigo-100 transition-colors">
+          <a href="/orders" className="inline-flex items-center gap-1 text-sm font-medium text-white hover:text-teal-100 transition-colors">
             Go to Orders
             <span className="material-symbols-outlined text-base">arrow_forward</span>
           </a>

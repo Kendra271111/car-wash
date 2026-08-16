@@ -776,7 +776,7 @@ const ViewOrder = () => {
         <OrderHeader title="View Order" subtitle={`Loading order #${id}...`} backHref="/orders" />
         <div className="card bg-white dark:bg-gray-950 p-4 rounded-lg shadow-md">
           <div className="p-8 text-center">
-            <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+            <span className="loading loading-spinner loading-lg text-teal-600"></span>
           </div>
         </div>
       </div>

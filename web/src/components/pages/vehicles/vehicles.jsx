@@ -9,7 +9,7 @@ const SortIndicator = ({ active, direction }) => {
     )
   }
   return (
-    <span className="text-indigo-600 dark:text-indigo-400 text-xs ml-1">
+    <span className="text-teal-600 dark:text-teal-400 text-xs ml-1">
       {direction === 'asc' ? '↑' : '↓'}
     </span>
   )
@@ -120,7 +120,7 @@ const Vehicles = () => {
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-12 text-center">
-              <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+              <span className="loading loading-spinner loading-lg text-teal-600"></span>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Loading vehicles...</p>
             </div>
           ) : filtered.length === 0 ? (

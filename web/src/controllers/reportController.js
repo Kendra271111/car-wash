@@ -10,4 +10,9 @@ export const fetchOrdersReport = async (period = '30d') => {
   return res.data.data || []
 }
 
-export default { fetchRevenueReport, fetchOrdersReport }
+export const fetchComparisonReport = async (period = '30d') => {
+  const res = await api.get('/reports/comparison', { params: { period } })
+  return res.data.data || null
+}
+
+export default { fetchRevenueReport, fetchOrdersReport, fetchComparisonReport }

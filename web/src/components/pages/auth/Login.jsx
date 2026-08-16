@@ -56,7 +56,7 @@ const Login = () => {
       <div className="relative z-10 w-full max-w-sm px-4">
         <div className="card bg-white/95 dark:bg-gray-950/95 backdrop-blur p-8 rounded-2xl shadow-2xl border border-white/20">
           <div className="text-center mb-8">
-            <div className="w-14 h-14 rounded-xl bg-indigo-600 flex items-center justify-center text-white mx-auto mb-4 shadow-lg">
+            <div className="w-14 h-14 rounded-xl bg-teal-600 flex items-center justify-center text-white mx-auto mb-4 shadow-lg">
               <span className="material-symbols-outlined text-3xl">directions_car</span>
             </div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">WASHINGTON</h1>
@@ -75,7 +75,7 @@ const Login = () => {
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Email</label>
               <input
                 type="email"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-800 dark:text-white transition-all"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent dark:bg-gray-800 dark:text-white transition-all"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -86,7 +86,7 @@ const Login = () => {
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Password</label>
               <input
                 type="password"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-800 dark:text-white transition-all"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent dark:bg-gray-800 dark:text-white transition-all"
                 placeholder="Insert your password here"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

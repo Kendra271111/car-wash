@@ -13,7 +13,7 @@ import OrderPayment from './components/pages/orders/orderPayment.jsx'
 import History from './components/pages/history.jsx'
 import Customers from './components/pages/customers/customers.jsx'
 import CreateCustomer from './components/pages/customers/createCustomer.jsx'
-import Staff from './components/pages/staff/staff.jsx'
+import Staffs from './components/pages/staff/staffs.jsx'
 import CreateStaff from './components/pages/staff/createStaff.jsx'
 import Vehicles from './components/pages/vehicles/vehicles.jsx'
 import CreateVehicle from './components/pages/vehicles/createVehicle.jsx'
@@ -68,7 +68,7 @@ function App() {
           <Route path="/history" element={<History />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/customers/create" element={<CreateCustomer />} />
-          <Route path="/staff" element={<Staff />} />
+          <Route path="/staff" element={<Staffs />} />
           <Route path="/staff/create" element={<CreateStaff />} />
           <Route path="/vehicles" element={<Vehicles />} />
           <Route path="/vehicles/create" element={<CreateVehicle />} />
