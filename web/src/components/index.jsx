@@ -63,7 +63,6 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Hero with slideshow */}
       <div className="relative h-64 rounded-2xl overflow-hidden shadow-2xl">
         {bgImages.map((img, idx) => (
           <div
@@ -98,8 +97,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-
-      {/* Stats Grid */}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {loading ? (
           cards.map((_, i) => (
@@ -123,7 +121,7 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Quick Actions & Info */}
+   
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="card bg-white dark:bg-gray-950 p-6 rounded-xl shadow-md lg:col-span-2">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Quick Actions</h2>

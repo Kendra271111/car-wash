@@ -251,7 +251,6 @@ const Orders = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Active Orders</h1>
@@ -261,7 +260,6 @@ const Orders = () => {
           </Link>
         </div>
 
-        {/* Toolbar */}
         <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between p-4 bg-white dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800">
           <div className="flex flex-col gap-2">
             <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Date Range</span>
@@ -305,7 +303,6 @@ const Orders = () => {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => {
           const colors = getStatColorClasses(card.key)
@@ -324,7 +321,6 @@ const Orders = () => {
         })}
       </div>
 
-      {/* Filters */}
       <div className="tabs tabs-boxed bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 p-1 rounded-xl w-fit">
         {FILTERS.map(({ key, label }) => (
           <button
@@ -337,7 +333,6 @@ const Orders = () => {
         ))}
       </div>
 
-      {/* Error */}
       {error && (
         <div className="alert alert-error">
           <span className="material-symbols-outlined">error</span>
@@ -346,7 +341,6 @@ const Orders = () => {
         </div>
       )}
 
-      {/* Table Card */}
       <div className="card bg-white dark:bg-gray-950 rounded-xl shadow-md border border-gray-200 dark:border-gray-800 overflow-hidden">
         <div className="overflow-x-auto">
           {loading ? (
