@@ -41,9 +41,9 @@ export const getStaffById = async (req: Request, res: Response, next: NextFuncti
 
 export const createStaff = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { name, email, phone, position } = req.body;
+    const { name, email, phone, position, isActive } = req.body;
     const newStaff = await prisma.staff.create({
-      data: { name, email, phone: phone || null, position: position || null },
+      data: { name, email, phone: phone || null, position: position || null, isActive: isActive ?? true },
     });
     return res.status(201).json({ message: 'Staff created successfully', data: newStaff });
   } catch (error) {

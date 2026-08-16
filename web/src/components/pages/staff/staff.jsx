@@ -154,7 +154,7 @@ const Staff = () => {
               </thead>
               <tbody>
                 {sorted.map((member) => (
-                  <tr key={member.id} className="hover">
+                  <tr key={member.id} className={`hover ${!member.isActive ? 'opacity-50' : ''}`}>
                     <td className="font-mono text-sm">{member.id}</td>
                     <td>{member.name}</td>
                     <td>{member.email}</td>

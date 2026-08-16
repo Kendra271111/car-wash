@@ -1,11 +1,10 @@
-import { useEffect, useState, useMemo, useRef } from "react";
-import { toPng } from "html-to-image";
+import { useEffect, useState, useMemo } from "react";
 import { Link, useParams, useNavigate } from "react-router";
 import orderController, {
   statusColors,
   statusLabels,
 } from "../../../controllers/orderController.js";
-import { pdf, Document, Page, View, Image, StyleSheet } from "@react-pdf/renderer";
+import { pdf, Document, Page, View, Image, StyleSheet, Text } from "@react-pdf/renderer";
 
 const formatDate = (dateString) => {
   if (!dateString) return "-";
@@ -243,7 +242,6 @@ const OrderActions = ({ order, payment, onComplete, completing, onPrint }) => {
 };
 
 const InvoiceModal = ({ order, payment, onClose }) => {
-  const invoiceRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
   if (!order || !onClose) return null;
   const status = order.status || "PENDING";
@@ -252,25 +250,148 @@ const InvoiceModal = ({ order, payment, onClose }) => {
   const serviceCount = (order.order_items || []).reduce((sum, item) => sum + (item.qty || 0), 0);
   const totalDuration = (order.order_items || []).reduce((sum, item) => sum + (item.duration || 0), 0);
 
+  const getStatusColor = (s) => {
+    switch (s) {
+      case 'PAID': return '#16a34a'
+      case 'PENDING': return '#d97706'
+      case 'FAILED': return '#dc2626'
+      case 'COMPLETED': return '#2563eb'
+      case 'CANCELLED': return '#dc2626'
+      default: return '#6b7280'
+    }
+  };
+
+  const InvoicePDF = () => (
+    <Document>
+      <Page size="A4" style={pdfStyles.page}>
+        <View style={pdfStyles.header}>
+          <View>
+            <Text style={pdfStyles.companyName}>WASHINGTON</Text>
+            <Text style={pdfStyles.subtitle}>Service Ticket</Text>
+          </View>
+          <View style={pdfStyles.orderInfo}>
+            <Text style={pdfStyles.orderId}>Order #{order.id}</Text>
+            <Text style={pdfStyles.orderDate}>{formatDate(order.createdAt)}</Text>
+          </View>
+        </View>
+
+        <View style={pdfStyles.section}>
+          <View style={pdfStyles.twoCol}>
+            <View style={pdfStyles.col}>
+              <Text style={pdfStyles.sectionLabel}>Customer</Text>
+              {order.customer ? (
+                <View>
+                  <Text style={pdfStyles.fieldValue}>{order.customer.name}</Text>
+                  <Text style={pdfStyles.fieldText}>{order.customer.email}</Text>
+                  <Text style={pdfStyles.fieldText}>{order.customer.phone}</Text>
+                </View>
+              ) : (
+                <Text style={pdfStyles.fieldMuted}>Customer #{order.customerId}</Text>
+              )}
+            </View>
+            <View style={pdfStyles.col}>
+              <Text style={pdfStyles.sectionLabel}>Vehicle</Text>
+              {order.vehicle ? (
+                <View>
+                  <Text style={pdfStyles.fieldValue}>{order.vehicle.brand} {order.vehicle.model}</Text>
+                  <Text style={pdfStyles.fieldText}>{order.vehicle.name}</Text>
+                  <Text style={pdfStyles.fieldText}>{order.vehicle.plateNumber}</Text>
+                </View>
+              ) : (
+                <Text style={pdfStyles.fieldMuted}>Vehicle #{order.vehicleId}</Text>
+              )}
+            </View>
+          </View>
+        </View>
+
+        <View style={pdfStyles.section}>
+          <Text style={pdfStyles.sectionLabel}>Service Details</Text>
+          <View style={pdfStyles.table}>
+            <View style={pdfStyles.tableHeader}>
+              <Text style={[pdfStyles.tableCell, pdfStyles.tableCellHeader, { flex: 3 }]}>Service</Text>
+              <Text style={[pdfStyles.tableCell, pdfStyles.tableCellHeader, { flex: 1, textAlign: 'center' }]}>Qty</Text>
+              <Text style={[pdfStyles.tableCell, pdfStyles.tableCellHeader, { flex: 1, textAlign: 'center' }]}>Duration</Text>
+              <Text style={[pdfStyles.tableCell, pdfStyles.tableCellHeader, { flex: 1, textAlign: 'right' }]}>Price</Text>
+              <Text style={[pdfStyles.tableCell, pdfStyles.tableCellHeader, { flex: 1, textAlign: 'right' }]}>Subtotal</Text>
+            </View>
+            {(order.order_items || []).map((item, idx) => (
+              <View key={item.id} style={[pdfStyles.tableRow, idx === (order.order_items || []).length - 1 && pdfStyles.tableRowLast]}>
+                <Text style={[pdfStyles.tableCell, { flex: 3 }]}>{item.service?.name || `Service #${item.serviceId}`}</Text>
+                <Text style={[pdfStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{item.qty}</Text>
+                <Text style={[pdfStyles.tableCell, { flex: 1, textAlign: 'center' }]}>{item.duration} min</Text>
+                <Text style={[pdfStyles.tableCell, { flex: 1, textAlign: 'right' }]}>${Number(item.price).toFixed(2)}</Text>
+                <Text style={[pdfStyles.tableCellBold, { flex: 1, textAlign: 'right' }]}>${Number(item.subtotal).toFixed(2)}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        <View style={pdfStyles.section}>
+          <View style={pdfStyles.totals}>
+            <View style={pdfStyles.totalRow}>
+              <Text style={pdfStyles.totalLabel}>Total Services</Text>
+              <Text style={pdfStyles.totalValue}>{serviceCount} service(s)</Text>
+            </View>
+            <View style={pdfStyles.totalRow}>
+              <Text style={pdfStyles.totalLabel}>Total Duration</Text>
+              <Text style={pdfStyles.totalValue}>{totalDuration} min</Text>
+            </View>
+            <View style={pdfStyles.totalRowFinal}>
+              <Text style={pdfStyles.totalLabelFinal}>Total</Text>
+              <Text style={pdfStyles.totalValueFinal}>${totalAmount.toFixed(2)}</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={pdfStyles.section}>
+          <View style={pdfStyles.twoCol}>
+            <View>
+              <Text style={pdfStyles.sectionLabel}>Status</Text>
+              <View style={[pdfStyles.badge, { backgroundColor: getStatusColor(status) }]}>
+                <Text style={pdfStyles.badgeText}>{statusLabels[status] || status}</Text>
+              </View>
+            </View>
+            <View style={pdfStyles.colRight}>
+              <Text style={pdfStyles.sectionLabel}>Payment</Text>
+              {payment ? (
+                <View style={pdfStyles.paymentBlock}>
+                  <View style={[pdfStyles.badge, { backgroundColor: isPaid ? '#16a34a' : '#d97706' }]}>
+                    <Text style={pdfStyles.badgeText}>{payment.status}</Text>
+                  </View>
+                  <Text style={pdfStyles.fieldText}>{payment.method}</Text>
+                  {isPaid && (
+                    <View>
+                      <Text style={pdfStyles.fieldText}>Paid: ${Number(payment.amount).toFixed(2)}</Text>
+                      <Text style={pdfStyles.fieldText}>Change: ${Number(payment.change).toFixed(2)}</Text>
+                    </View>
+                  )}
+                </View>
+              ) : (
+                <Text style={pdfStyles.fieldMuted}>Unpaid</Text>
+              )}
+            </View>
+          </View>
+        </View>
+
+        {order.note && (
+          <View style={pdfStyles.section}>
+            <Text style={pdfStyles.sectionLabel}>Notes</Text>
+            <Text style={pdfStyles.fieldText}>{order.note}</Text>
+          </View>
+        )}
+
+        <View style={pdfStyles.footer}>
+          <Text style={pdfStyles.footerText}>Staff: {order.staff?.name || `Staff #${order.staffId}`}</Text>
+        </View>
+      </Page>
+    </Document>
+  );
+
   const handleDownloadPDF = async () => {
-    if (!invoiceRef.current || downloading) return;
+    if (downloading) return;
     setDownloading(true);
     try {
-      const dataUrl = await toPng(invoiceRef.current, {
-        quality: 1,
-        pixelRatio: 2,
-        backgroundColor: "#ffffff",
-      });
-
-      const InvoicePDFDocument = () => (
-        <Document>
-          <Page size="A4" style={pdfStyles.page}>
-            <Image src={dataUrl} style={pdfStyles.image} />
-          </Page>
-        </Document>
-      );
-
-      const blob = await pdf(<InvoicePDFDocument />).toBlob();
+      const blob = await pdf(<InvoicePDF />).toBlob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -286,34 +407,191 @@ const InvoiceModal = ({ order, payment, onClose }) => {
 
   const pdfStyles = StyleSheet.create({
     page: {
-      padding: 0,
-      flexDirection: "row",
-      backgroundColor: "#ffffff",
+      padding: 40,
+      fontFamily: 'Helvetica',
+      fontSize: 10,
+      lineHeight: 1.5,
+      color: '#1f2937',
     },
-    image: {
-      width: "100%",
-      height: "auto",
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 24,
+    },
+    companyName: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#111827',
+    },
+    subtitle: {
+      fontSize: 9,
+      color: '#6b7280',
+      marginTop: 2,
+    },
+    orderInfo: {
+      alignItems: 'flex-end',
+    },
+    orderId: {
+      fontSize: 10,
+      fontWeight: 'bold',
+      color: '#111827',
+    },
+    orderDate: {
+      fontSize: 9,
+      color: '#6b7280',
+      marginTop: 2,
+    },
+    section: {
+      marginBottom: 16,
+    },
+    sectionLabel: {
+      fontSize: 9,
+      fontWeight: 'bold',
+      color: '#9ca3af',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginBottom: 6,
+    },
+    twoCol: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    col: {
+      flex: 1,
+      marginRight: 12,
+    },
+    colRight: {
+      flex: 1,
+      alignItems: 'flex-end',
+    },
+    fieldValue: {
+      fontSize: 10,
+      fontWeight: 'bold',
+      color: '#111827',
+    },
+    fieldText: {
+      fontSize: 9,
+      color: '#4b5563',
+      marginTop: 1,
+    },
+    fieldMuted: {
+      fontSize: 9,
+      color: '#9ca3af',
+    },
+    table: {
+      width: '100%',
+      marginTop: 4,
+    },
+    tableHeader: {
+      flexDirection: 'row',
+      borderBottomWidth: 1,
+      borderBottomColor: '#e5e7eb',
+      paddingBottom: 6,
+      marginBottom: 4,
+    },
+    tableRow: {
+      flexDirection: 'row',
+      borderBottomWidth: 1,
+      borderBottomColor: '#f3f4f6',
+      paddingVertical: 4,
+      alignItems: 'center',
+    },
+    tableRowLast: {
+      borderBottomWidth: 0,
+    },
+    tableCell: {
+      fontSize: 9,
+      color: '#4b5563',
+    },
+    tableCellHeader: {
+      fontSize: 9,
+      fontWeight: 'bold',
+      color: '#6b7280',
+    },
+    tableCellBold: {
+      fontSize: 9,
+      fontWeight: 'bold',
+      color: '#111827',
+    },
+    totals: {
+      width: '100%',
+    },
+    totalRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingVertical: 3,
+    },
+    totalLabel: {
+      fontSize: 9,
+      color: '#6b7280',
+    },
+    totalValue: {
+      fontSize: 9,
+      fontWeight: 'bold',
+      color: '#111827',
+    },
+    totalRowFinal: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      borderTopWidth: 1,
+      borderTopColor: '#e5e7eb',
+      paddingTop: 8,
+      marginTop: 6,
+    },
+    totalLabelFinal: {
+      fontSize: 11,
+      fontWeight: 'bold',
+      color: '#111827',
+    },
+    totalValueFinal: {
+      fontSize: 13,
+      fontWeight: 'bold',
+      color: '#111827',
+    },
+    badge: {
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 4,
+      marginTop: 2,
+    },
+    badgeText: {
+      fontSize: 9,
+      fontWeight: 'bold',
+      color: '#fff',
+    },
+    paymentBlock: {
+      alignItems: 'flex-end',
+    },
+    footer: {
+      marginTop: 24,
+      paddingTop: 10,
+      borderTopWidth: 1,
+      borderTopColor: '#e5e7eb',
+    },
+    footerText: {
+      fontSize: 9,
+      color: '#9ca3af',
     },
   });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div ref={invoiceRef} className="relative bg-white dark:bg-gray-900 w-full max-w-xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
-        <div className="p-8">
-          <div className="flex justify-between items-start mb-6">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white dark:bg-gray-900 w-full max-w-2xl shadow-2xl rounded-xl border border-gray-200 dark:border-gray-700 max-h-[90vh] overflow-y-auto">
+        <div className="p-6 md:p-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">WASHINGTON</h1>
               <p className="text-sm text-gray-500 dark:text-gray-400">Service Ticket</p>
             </div>
-            <div className="text-right">
+            <div className="text-left sm:text-right">
               <p className="text-sm font-medium text-gray-900 dark:text-white">Order #{order.id}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(order.createdAt)}</p>
             </div>
           </div>
 
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Customer</p>
                 {order.customer ? (
@@ -343,57 +621,61 @@ const InvoiceModal = ({ order, payment, onClose }) => {
 
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
             <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Service Details</p>
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service</th>
-                  <th className="text-center py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Qty</th>
-                  <th className="text-center py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Duration</th>
-                  <th className="text-right py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price</th>
-                  <th className="text-right py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(order.order_items || []).map((item) => (
-                  <tr key={item.id} className="border-b border-gray-100 dark:border-gray-800 last:border-0">
-                    <td className="py-3 text-sm text-gray-900 dark:text-white">{item.service?.name || `Service #${item.serviceId}`}</td>
-                    <td className="py-3 text-sm text-center text-gray-600 dark:text-gray-300">{item.qty}</td>
-                    <td className="py-3 text-sm text-center text-gray-600 dark:text-gray-300">{item.duration} min</td>
-                    <td className="py-3 text-sm text-right text-gray-600 dark:text-gray-300">${Number(item.price).toFixed(2)}</td>
-                    <td className="py-3 text-sm text-right font-medium text-gray-900 dark:text-white">${Number(item.subtotal).toFixed(2)}</td>
+            <div className="overflow-x-auto">
+              <table className="table table-zebra w-full">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <th className="text-left py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service</th>
+                    <th className="text-center py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Qty</th>
+                    <th className="text-center py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Duration</th>
+                    <th className="text-right py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price</th>
+                    <th className="text-right py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Subtotal</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Total Services</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-white">{serviceCount} service(s)</span>
-            </div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Total Duration</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-white">{totalDuration} min</span>
-            </div>
-            <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
-              <span className="text-base font-semibold text-gray-900 dark:text-white">Total</span>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">${totalAmount.toFixed(2)}</span>
+                </thead>
+                <tbody>
+                  {(order.order_items || []).map((item) => (
+                    <tr key={item.id} className="border-b border-gray-100 dark:border-gray-800 last:border-0">
+                      <td className="py-3 text-sm text-gray-900 dark:text-white">{item.service?.name || `Service #${item.serviceId}`}</td>
+                      <td className="py-3 text-sm text-center text-gray-600 dark:text-gray-300">{item.qty}</td>
+                      <td className="py-3 text-sm text-center text-gray-600 dark:text-gray-300">{item.duration} min</td>
+                      <td className="py-3 text-sm text-right text-gray-600 dark:text-gray-300">${Number(item.price).toFixed(2)}</td>
+                      <td className="py-3 text-sm text-right font-medium text-gray-900 dark:text-white">${Number(item.subtotal).toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500 dark:text-gray-400">Total Services</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">{serviceCount} service(s)</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500 dark:text-gray-400">Total Duration</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">{totalDuration} min</span>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
+                <span className="text-base font-semibold text-gray-900 dark:text-white">Total</span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">${totalAmount.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Status</p>
                 <span className={`badge ${statusColors[status] || 'badge-neutral'}`}>
                   {statusLabels[status] || status}
                 </span>
               </div>
-              <div className="text-right">
+              <div className="text-left sm:text-right">
                 <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Payment</p>
                 {payment ? (
-                  <div className="flex flex-col gap-1 items-end">
+                  <div className="flex flex-col gap-1 items-start sm:items-end">
                     <span className={`badge ${isPaid ? 'badge-success' : 'badge-warning'}`}>{payment.status}</span>
                     <p className="text-sm text-gray-600 dark:text-gray-300">{payment.method}</p>
                     {isPaid && (
@@ -417,11 +699,11 @@ const InvoiceModal = ({ order, payment, onClose }) => {
             </div>
           )}
 
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 flex justify-between items-center">
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 flex flex-col sm:flex-row justify-between items-center gap-3">
             <p className="text-xs text-gray-400 dark:text-gray-500">Staff: {order.staff?.name || `Staff #${order.staffId}`}</p>
-            <div className="flex gap-2">
-              <button className="btn btn-ghost btn-sm" onClick={onClose}>Close</button>
-              <button className="btn btn-primary btn-sm" onClick={handleDownloadPDF} disabled={downloading}>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <button className="btn btn-ghost btn-sm flex-1 sm:flex-none" onClick={onClose}>Close</button>
+              <button className="btn btn-primary btn-sm flex-1 sm:flex-none" onClick={handleDownloadPDF} disabled={downloading}>
                 {downloading ? "Generating..." : "Download PDF"}
               </button>
             </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router'
 import staffController from '../../../controllers/staffController.js'
 
@@ -12,10 +12,16 @@ const CreateStaff = () => {
     email: '',
     phone: '',
     position: '',
+    isActive: true,
+  })
+
+  const formRef = useRef(form)
+  useEffect(() => {
+    formRef.current = form
   })
 
   const updateField = (field, value) => {
-    setForm({ ...form, [field]: value })
+    setForm((prev) => ({ ...prev, [field]: value }))
   }
 
   const handleSubmit = async (e) => {
@@ -24,13 +30,14 @@ const CreateStaff = () => {
     setError(null)
     try {
       await staffController.createStaff({
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
-        position: form.position,
+        name: formRef.current.name,
+        email: formRef.current.email,
+        phone: formRef.current.phone,
+        position: formRef.current.position,
+        isActive: formRef.current.isActive,
       })
       setSuccess(true)
-      setForm({ name: '', email: '', phone: '', position: '' })
+      setForm({ name: '', email: '', phone: '', position: '', isActive: true })
       setTimeout(() => setSuccess(false), 3000)
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create staff.')
@@ -113,6 +120,17 @@ const CreateStaff = () => {
                 onChange={(e) => updateField('position', e.target.value)}
               />
             </div>
+          </div>
+          <div className='w-full'>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+            <select
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
+              value={String(form.isActive)}
+              onChange={(e) => updateField('isActive', e.target.value === 'true')}
+            >
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
           </div>
           <div className="flex justify-end">
             <button type="submit" className="btn btn-primary" disabled={loading}>

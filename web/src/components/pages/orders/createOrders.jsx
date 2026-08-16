@@ -50,7 +50,8 @@ const CreateOrders = () => {
           serviceController.fetchServices(),
         ]);
         if (!cancelled) {
-          setOptions({ services, vehicles, customers, staff });
+          const activeStaff = staff.filter((s) => s.isActive);
+          setOptions({ services, vehicles, customers, staff: activeStaff });
           setServiceOptions(services);
         }
       } catch (err) {
