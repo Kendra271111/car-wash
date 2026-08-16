@@ -2,6 +2,19 @@ import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router'
 import serviceController from '../../../controllers/serviceController.js'
 
+const SortIndicator = ({ active, direction }) => {
+  if (!active) {
+    return (
+      <span className="opacity-20 text-xs ml-1">↑↓</span>
+    )
+  }
+  return (
+    <span className="text-indigo-600 dark:text-indigo-400 text-xs ml-1">
+      {direction === 'asc' ? '↑' : '↓'}
+    </span>
+  )
+}
+
 const Services = () => {
   const [services, setServices] = useState([])
   const [loading, setLoading] = useState(true)
@@ -71,7 +84,7 @@ const Services = () => {
   }, [filtered, sortKey, sortDirection])
 
   return (
-    <div>
+    <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Services</h1>
@@ -91,50 +104,53 @@ const Services = () => {
           <div className="alert alert-error">
             <span className="material-symbols-outlined">error</span>
             <span>{error}</span>
+            <button className="btn btn-ghost btn-sm" onClick={() => window.location.reload()}>Retry</button>
           </div>
         )}
+      </div>
 
-        <div className="card bg-white dark:bg-gray-950 rounded-lg shadow-md overflow-hidden">
-          <div className="overflow-x-auto">
-            {loading ? (
-              <div className="p-8 text-center">
-                <span className="loading loading-spinner loading-lg text-indigo-600"></span>
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="p-8 text-center">
-                <p className="text-gray-500 dark:text-gray-400">No services found.</p>
-              </div>
-            ) : (
-              <table className="table">
-                <thead>
+      <div className="card bg-white dark:bg-gray-950 rounded-xl shadow-md border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div className="overflow-x-auto">
+          {loading ? (
+            <div className="p-12 text-center">
+              <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Loading services...</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="p-12 text-center">
+              <span className="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600 mb-3">local_car_wash</span>
+              <p className="text-gray-500 dark:text-gray-400">No services found.</p>
+            </div>
+          ) : (
+            <table className="table table-zebra">
+              <thead className="bg-gray-50 dark:bg-gray-900/50">
                 <tr>
-                  <th className="cursor-pointer" onClick={() => requestSort('id')}>
-                    ID {sortKey === 'id' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('id')}>
+                    <div className="flex items-center gap-1">ID <SortIndicator active={sortKey === 'id'} direction={sortDirection} /></div>
                   </th>
-                  <th className="cursor-pointer" onClick={() => requestSort('name')}>
-                      Name {sortKey === 'name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
-                    <th className="cursor-pointer" onClick={() => requestSort('duration')}>
-                      Duration (min) {sortKey === 'duration' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
-                    <th className="cursor-pointer" onClick={() => requestSort('price')}>
-                      Price {sortKey === 'price' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('name')}>
+                    <div className="flex items-center gap-1">Name <SortIndicator active={sortKey === 'name'} direction={sortDirection} /></div>
+                  </th>
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('duration')}>
+                    <div className="flex items-center gap-1">Duration (min) <SortIndicator active={sortKey === 'duration'} direction={sortDirection} /></div>
+                  </th>
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('price')}>
+                    <div className="flex items-center gap-1">Price <SortIndicator active={sortKey === 'price'} direction={sortDirection} /></div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {sorted.map((service) => (
+                  <tr key={service.id} className="hover">
+                    <td className="font-mono text-sm">{service.id}</td>
+                    <td>{service.name}</td>
+                    <td>{service.duration}</td>
+                    <td>${Number(service.price).toFixed(2)}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {sorted.map((service) => (
-                    <tr key={service.id}>
-                      <td>{service.id}</td>
-                      <td>{service.name}</td>
-                      <td>{service.duration}</td>
-                      <td>${Number(service.price).toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

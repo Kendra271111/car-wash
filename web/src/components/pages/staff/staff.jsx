@@ -2,6 +2,19 @@ import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router'
 import staffController from '../../../controllers/staffController.js'
 
+const SortIndicator = ({ active, direction }) => {
+  if (!active) {
+    return (
+      <span className="opacity-20 text-xs ml-1">↑↓</span>
+    )
+  }
+  return (
+    <span className="text-indigo-600 dark:text-indigo-400 text-xs ml-1">
+      {direction === 'asc' ? '↑' : '↓'}
+    </span>
+  )
+}
+
 const Staff = () => {
   const [staff, setStaff] = useState([])
   const [loading, setLoading] = useState(true)
@@ -78,7 +91,7 @@ const Staff = () => {
   }, [filtered, sortKey, sortDirection])
 
   return (
-    <div>
+    <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Staff</h1>
@@ -98,62 +111,65 @@ const Staff = () => {
           <div className="alert alert-error">
             <span className="material-symbols-outlined">error</span>
             <span>{error}</span>
+            <button className="btn btn-ghost btn-sm" onClick={() => window.location.reload()}>Retry</button>
           </div>
         )}
+      </div>
 
-        <div className="card bg-white dark:bg-gray-950 rounded-lg shadow-md overflow-hidden">
-          <div className="overflow-x-auto">
-            {loading ? (
-              <div className="p-8 text-center">
-                <span className="loading loading-spinner loading-lg text-indigo-600"></span>
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="p-8 text-center">
-                <p className="text-gray-500 dark:text-gray-400">No staff found.</p>
-              </div>
-            ) : (
-              <table className="table">
-                <thead>
+      <div className="card bg-white dark:bg-gray-950 rounded-xl shadow-md border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div className="overflow-x-auto">
+          {loading ? (
+            <div className="p-12 text-center">
+              <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Loading staff...</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="p-12 text-center">
+              <span className="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600 mb-3">badge</span>
+              <p className="text-gray-500 dark:text-gray-400">No staff found.</p>
+            </div>
+          ) : (
+            <table className="table table-zebra">
+              <thead className="bg-gray-50 dark:bg-gray-900/50">
                 <tr>
-                  <th className="cursor-pointer" onClick={() => requestSort('id')}>
-                    ID {sortKey === 'id' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('id')}>
+                    <div className="flex items-center gap-1">ID <SortIndicator active={sortKey === 'id'} direction={sortDirection} /></div>
                   </th>
-                  <th className="cursor-pointer" onClick={() => requestSort('name')}>
-                      Name {sortKey === 'name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
-                    <th className="cursor-pointer" onClick={() => requestSort('email')}>
-                      Email {sortKey === 'email' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
-                    <th className="cursor-pointer" onClick={() => requestSort('phone')}>
-                      Phone {sortKey === 'phone' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
-                    <th className="cursor-pointer" onClick={() => requestSort('position')}>
-                      Position {sortKey === 'position' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
-                    <th className="cursor-pointer" onClick={() => requestSort('status')}>
-                      Status {sortKey === 'status' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('name')}>
+                    <div className="flex items-center gap-1">Name <SortIndicator active={sortKey === 'name'} direction={sortDirection} /></div>
+                  </th>
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('email')}>
+                    <div className="flex items-center gap-1">Email <SortIndicator active={sortKey === 'email'} direction={sortDirection} /></div>
+                  </th>
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('phone')}>
+                    <div className="flex items-center gap-1">Phone <SortIndicator active={sortKey === 'phone'} direction={sortDirection} /></div>
+                  </th>
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('position')}>
+                    <div className="flex items-center gap-1">Position <SortIndicator active={sortKey === 'position'} direction={sortDirection} /></div>
+                  </th>
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('status')}>
+                    <div className="flex items-center gap-1">Status <SortIndicator active={sortKey === 'status'} direction={sortDirection} /></div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {sorted.map((member) => (
+                  <tr key={member.id} className="hover">
+                    <td className="font-mono text-sm">{member.id}</td>
+                    <td>{member.name}</td>
+                    <td>{member.email}</td>
+                    <td>{member.phone || '-'}</td>
+                    <td>{member.position || '-'}</td>
+                    <td>
+                      <span className={`badge ${member.isActive ? 'badge-success' : 'badge-error'}`}>
+                        {member.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {sorted.map((member) => (
-                    <tr key={member.id}>
-                      <td>{member.id}</td>
-                      <td>{member.name}</td>
-                      <td>{member.email}</td>
-                      <td>{member.phone || '-'}</td>
-                      <td>{member.position || '-'}</td>
-                      <td>
-                        <span className={`badge ${member.isActive ? 'badge-success' : 'badge-error'}`}>
-                          {member.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

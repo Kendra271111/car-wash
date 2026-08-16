@@ -4,6 +4,28 @@ import orderController from "../../controllers/orderController.js";
 
 const { statusColors, statusLabels } = orderController;
 
+const SortIndicator = ({ active, direction }) => {
+  if (!active) {
+    return (
+      <span className="opacity-20 text-xs ml-1">↑↓</span>
+    )
+  }
+  return (
+    <span className="text-indigo-600 dark:text-indigo-400 text-xs ml-1">
+      {direction === 'asc' ? '↑' : '↓'}
+    </span>
+  )
+}
+
+const formatDate = (dateString) => {
+  if (!dateString) return '-'
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })
+}
+
 const History = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -137,9 +159,9 @@ const History = () => {
   const totalCount = filtered.length;
 
   return (
-    <div>
+    <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
-        <div className="flex flex-row justify-between">
+        <div className="flex flex-row justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
             Order History
           </h1>
@@ -154,225 +176,201 @@ const History = () => {
           </div>
         </div>
 
-        <div className="flex flex-row flex-wrap gap-2">
-          <div className="flex flex-row gap-2 items-center flex-wrap">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Date range:</span>
-            <button type="button" className="btn btn-ghost btn-xs" onClick={() => applyPreset(0)}>Today</button>
-            <button type="button" className="btn btn-ghost btn-xs" onClick={() => applyPreset(7)}>Last 7 days</button>
-            <button type="button" className="btn btn-ghost btn-xs" onClick={() => applyPreset(30)}>Last 30 days</button>
-            {dateRangeLabel && (
-              <span className="badge badge-primary badge-outline ml-2">
-                {dateRangeLabel}
-              </span>
-            )}
-            {dateRangeLabel && (
-              <button
-                type="button"
-                className="btn btn-ghost btn-xs"
-                onClick={clearDates}
-              >
-                Clear
-              </button>
-            )}
+        <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between p-4 bg-white dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800">
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Date Range</span>
+            <div className="join join-sm">
+              <button type="button" className="btn join-item btn-ghost btn-xs" onClick={() => applyPreset(0)}>Today</button>
+              <button type="button" className="btn join-item btn-ghost btn-xs" onClick={() => applyPreset(7)}>Last 7 days</button>
+              <button type="button" className="btn join-item btn-ghost btn-xs" onClick={() => applyPreset(30)}>Last 30 days</button>
+            </div>
           </div>
-        </div>
-        <div className="flex flex-row">
-          <div className="flex flex-row justify-between w-full">
-            <div className='flex flex-row gap-2 items-center'>
-              <div className="flex flex-row gap-2 items-center">
-                <label className="text-sm text-gray-600 dark:text-gray-300">From:</label>
-                <input
-                  type="date"
-                  className="input input-bordered input-sm"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-              </div>
-              <div className="flex flex-row gap-2 items-center">
-                <label className="text-sm text-gray-600 dark:text-gray-300">To:</label>
-                <input
-                  type="date"
-                  className="input input-bordered input-sm"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-              </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center w-full xl:w-auto">
+            <div className="flex flex-row gap-2 items-center">
+              <input
+                type="date"
+                className="input input-bordered input-sm"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+              <span className="text-gray-400 dark:text-gray-500">→</span>
+              <input
+                type="date"
+                className="input input-bordered input-sm"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+              {dateRangeLabel && (
+                <button type="button" className="btn btn-ghost btn-xs" onClick={clearDates}>
+                  <span className="material-symbols-outlined text-sm">close</span>
+                  Clear
+                </button>
+              )}
             </div>
             <input
               type="text"
-              className="input input-bordered input-sm w-64"
+              className="input input-bordered input-sm w-full sm:w-64"
               placeholder="Search history..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
         </div>
-        <div className="flex flex-row gap-2 overflow-x-auto pb-1">
-          <button
-            className={`btn btn-ghost btn-sm ${filter === "all" ? "btn-active" : ""}`}
-            onClick={() => setFilter("all")}
-          >
-            All ({totalCount})
-          </button>
-          <button
-            className={`btn btn-ghost btn-sm ${filter === "COMPLETED" ? "btn-active" : ""}`}
-            onClick={() => setFilter("COMPLETED")}
-          >
-            Completed ({completedOrders.length})
-          </button>
-        </div>
+      </div>
 
-        <div className="card bg-white dark:bg-gray-950 rounded-lg shadow-md overflow-hidden">
-          <div className="overflow-x-auto">
-            {loading ? (
-              <div className="p-8 text-center">
-                <span className="loading loading-spinner loading-lg text-indigo-600"></span>
-              </div>
-            ) : error ? (
-              <div className="p-8 text-center">
-                <p className="text-error">{error}</p>
-                <button
-                  className="btn btn-ghost btn-sm mt-2"
-                  onClick={() => setRefetchKey((k) => k + 1)}
-                >
-                  Retry
-                </button>
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="p-8 text-center">
-                <p className="text-gray-500 dark:text-gray-400">
-                  No completed orders found.
-                </p>
-              </div>
-            ) : (
-              <table className="table">
-                <thead>
+      {error && (
+        <div className="alert alert-error">
+          <span className="material-symbols-outlined">error</span>
+          <span>{error}</span>
+          <button className="btn btn-ghost btn-sm" onClick={() => setRefetchKey((k) => k + 1)}>Retry</button>
+        </div>
+      )}
+
+      <div className="flex flex-row gap-2 overflow-x-auto pb-1">
+        <button
+          className={`btn btn-ghost btn-sm ${filter === "all" ? "btn-active" : ""}`}
+          onClick={() => setFilter("all")}
+        >
+          All ({totalCount})
+        </button>
+        <button
+          className={`btn btn-ghost btn-sm ${filter === "COMPLETED" ? "btn-active" : ""}`}
+          onClick={() => setFilter("COMPLETED")}
+        >
+          Completed ({completedOrders.length})
+        </button>
+      </div>
+
+      <div className="card bg-white dark:bg-gray-950 rounded-xl shadow-md border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div className="overflow-x-auto">
+          {loading ? (
+            <div className="p-12 text-center">
+              <span className="loading loading-spinner loading-lg text-indigo-600"></span>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Loading history...</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="p-12 text-center">
+              <span className="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600 mb-3">inventory_2</span>
+              <p className="text-gray-500 dark:text-gray-400">No completed orders found.</p>
+            </div>
+          ) : (
+            <table className="table table-zebra">
+              <thead className="bg-gray-50 dark:bg-gray-900/50">
                 <tr>
-                  <th className="cursor-pointer" onClick={() => requestSort('id')}>
-                    ID {sortKey === 'id' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('id')}>
+                    <div className="flex items-center gap-1">ID <SortIndicator active={sortKey === 'id'} direction={sortDirection} /></div>
                   </th>
-                  <th className="cursor-pointer" onClick={() => requestSort('vehicle')}>
-                      Vehicle {sortKey === 'vehicle' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
-                    <th className="cursor-pointer" onClick={() => requestSort('customer')}>
-                      Customer {sortKey === 'customer' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
-                    <th className="cursor-pointer" onClick={() => requestSort('staff')}>
-                      Staff {sortKey === 'staff' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
-                    <th className="cursor-pointer" onClick={() => requestSort('services')}>
-                      Services {sortKey === 'services' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
-                    <th className="cursor-pointer" onClick={() => requestSort('status')}>
-                      Status {sortKey === 'status' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
-                    <th className="cursor-pointer" onClick={() => requestSort('created')}>
-                      Created {sortKey === 'created' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                    </th>
-                    <th className="text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sorted.map((order) => {
-                    const status = order.status || "PENDING";
-                    return (
-                      <tr key={order.id}>
-                        <td>{order.id}</td>
-                        <td>
-                          {order.vehicle ? (
-                            <div>
-                              <p className="font-medium">
-                                {order.vehicle.brand} {order.vehicle.model}
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('vehicle')}>
+                    <div className="flex items-center gap-1">Vehicle <SortIndicator active={sortKey === 'vehicle'} direction={sortDirection} /></div>
+                  </th>
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('customer')}>
+                    <div className="flex items-center gap-1">Customer <SortIndicator active={sortKey === 'customer'} direction={sortDirection} /></div>
+                  </th>
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('staff')}>
+                    <div className="flex items-center gap-1">Staff <SortIndicator active={sortKey === 'staff'} direction={sortDirection} /></div>
+                  </th>
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('services')}>
+                    <div className="flex items-center gap-1">Services <SortIndicator active={sortKey === 'services'} direction={sortDirection} /></div>
+                  </th>
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('status')}>
+                    <div className="flex items-center gap-1">Status <SortIndicator active={sortKey === 'status'} direction={sortDirection} /></div>
+                  </th>
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('created')}>
+                    <div className="flex items-center gap-1">Created <SortIndicator active={sortKey === 'created'} direction={sortDirection} /></div>
+                  </th>
+                  <th className="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sorted.map((order) => {
+                  const status = order.status || "PENDING";
+                  return (
+                    <tr key={order.id} className="hover">
+                      <td className="font-mono text-sm">{order.id}</td>
+                      <td>
+                        {order.vehicle ? (
+                          <div>
+                            <p className="font-medium">
+                              {order.vehicle.brand} {order.vehicle.model}
+                            </p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              {order.vehicle.name}
+                            </p>
+                            {order.vehicle.plateNumber && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {order.vehicle.plateNumber}
                               </p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">
-                                {order.vehicle.name}
-                              </p>
-                              {order.vehicle.plateNumber && (
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                  {order.vehicle.plateNumber}
-                                </p>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-gray-400">
-                              #{order.vehicleId}
-                            </span>
-                          )}
-                        </td>
-                        <td>
-                          {order.customer ? (
-                            <div>
-                              <p className="font-medium">
-                                {order.customer.name}
-                              </p>
-                              {order.customer.phone && (
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                  {order.customer.phone}
-                                </p>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-gray-400">
-                              #{order.customerId}
-                            </span>
-                          )}
-                        </td>
-                        <td>
-                          {order.staff ? (
-                            <p className="font-medium">{order.staff.name}</p>
-                          ) : (
-                            <span className="text-gray-400">
-                              #{order.staffId}
-                            </span>
-                          )}
-                        </td>
-                        <td>
-                          {order.order_items && order.order_items.length > 0
-                            ? order.order_items.reduce(
-                                (sum, item) => sum + (item.qty || 0),
-                                0,
-                              )
-                            : "-"}
-                        </td>
-                        <td>
-                          <span
-                            className={`badge ${statusColors[status] || "badge-neutral"}`}
-                          >
-                            {statusLabels[status] || status}
-                          </span>
-                        </td>
-                        <td>
-                          {order.createdAt
-                            ? new Date(order.createdAt).toLocaleDateString(
-                                "en-US",
-                                {
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                                },
-                              )
-                            : "-"}
-                        </td>
-                        <td className="text-right">
-                          <div className="flex gap-1 justify-end">
-                            <Link
-                              to={`/orders/${order.id}`}
-                              className="btn btn-ghost btn-sm btn-square"
-                              title="View"
-                            >
-                              <span className="material-symbols-outlined">
-                                visibility
-                              </span>
-                            </Link>
+                            )}
                           </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
-          </div>
+                        ) : (
+                          <span className="text-gray-400">
+                            #{order.vehicleId}
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        {order.customer ? (
+                          <div>
+                            <p className="font-medium">
+                              {order.customer.name}
+                            </p>
+                            {order.customer.phone && (
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                {order.customer.phone}
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400">
+                            #{order.customerId}
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        {order.staff ? (
+                          <p className="font-medium">{order.staff.name}</p>
+                        ) : (
+                          <span className="text-gray-400">
+                            #{order.staffId}
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        {order.order_items && order.order_items.length > 0
+                          ? order.order_items.reduce(
+                              (sum, item) => sum + (item.qty || 0),
+                              0,
+                            )
+                          : "-"}
+                      </td>
+                      <td>
+                        <span
+                          className={`badge ${statusColors[status] || "badge-neutral"}`}
+                        >
+                          {statusLabels[status] || status}
+                        </span>
+                      </td>
+                      <td>{formatDate(order.createdAt)}</td>
+                      <td className="text-right">
+                        <div className="flex gap-1 justify-end">
+                          <Link
+                            to={`/orders/${order.id}`}
+                            className="btn btn-ghost btn-sm btn-square"
+                            title="View"
+                          >
+                            <span className="material-symbols-outlined">
+                              visibility
+                            </span>
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

@@ -41,8 +41,10 @@ const Sidebar = () => {
         <div className={`fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 dark:border-gray-800 dark:bg-gray-950 transition-transform duration-300 ease-in-out ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
           <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-800">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">C</div>
-              <span className="text-lg font-semibold text-gray-900 dark:text-white">CarWash</span>
+              <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+                <span className="material-symbols-outlined text-xl">directions_car</span>
+              </div>
+              <span className="text-lg font-semibold text-gray-900 dark:text-white">WASHINGTON</span>
             </div>
             <button className="lg:hidden p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800" onClick={() => setMobileOpen(false)}>
               <span className="material-symbols-outlined">close</span>

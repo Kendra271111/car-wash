@@ -8,7 +8,7 @@ import EditOrder from './components/pages/orders/editOrders.jsx'
 import ViewOrder from './components/pages/orders/viewOrders.jsx'
 import Services from './components/pages/services/services.jsx'
 import CreateServices from './components/pages/services/createServices.jsx'
-import Payments from './components/pages/payments.jsx'
+import Payments from './components/pages/payments/payments.jsx'
 import OrderPayment from './components/pages/orders/orderPayment.jsx'
 import History from './components/pages/history.jsx'
 import Customers from './components/pages/customers/customers.jsx'
@@ -19,7 +19,7 @@ import Vehicles from './components/pages/vehicles/vehicles.jsx'
 import CreateVehicle from './components/pages/vehicles/createVehicle.jsx'
 import Reports from './components/pages/reports.jsx'
 import Settings from './components/pages/settings.jsx'
-import Login from './components/pages/login.jsx'
+import Login from './components/pages/auth/Login.jsx'
 
 const RequireAuth = () => {
   const token = localStorage.getItem('token')

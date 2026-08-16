@@ -35,8 +35,8 @@ const OrderRow = ({ order }) => {
   const serviceCount = order.order_items?.reduce((sum, item) => sum + (item.qty || 0), 0) || 0
 
   return (
-    <tr>
-      <td>{order.id}</td>
+    <tr className="hover">
+      <td className="font-mono text-sm">{order.id}</td>
       <td>
         {vehicle ? (
           <div>
@@ -74,7 +74,7 @@ const OrderRow = ({ order }) => {
       <td>{serviceCount || '-'}</td>
       <td>{getStatusBadge(order)}</td>
       <td>{formatDate(order.createdAt)}</td>
-      <td className="text-right">
+      <td>
         <div className="flex gap-1 justify-end">
           <Link to={`/orders/${order.id}`} className="btn btn-ghost btn-sm btn-square" title="View">
             <span className="material-symbols-outlined">visibility</span>
@@ -86,6 +86,49 @@ const OrderRow = ({ order }) => {
       </td>
     </tr>
   )
+}
+
+const SortIndicator = ({ active, direction }) => {
+  if (!active) {
+    return (
+      <span className="opacity-20 text-xs ml-1">↑↓</span>
+    )
+  }
+  return (
+    <span className="text-indigo-600 dark:text-indigo-400 text-xs ml-1">
+      {direction === 'asc' ? '↑' : '↓'}
+    </span>
+  )
+}
+
+const getStatColorClasses = (key) => {
+  switch (key) {
+    case 'PENDING':
+      return {
+        icon: 'text-amber-500 dark:text-amber-400',
+        value: 'text-amber-500 dark:text-amber-400',
+      }
+    case 'PROCESSING':
+      return {
+        icon: 'text-blue-500 dark:text-blue-400',
+        value: 'text-blue-500 dark:text-blue-400',
+      }
+    case 'COMPLETED':
+      return {
+        icon: 'text-emerald-500 dark:text-emerald-400',
+        value: 'text-emerald-500 dark:text-emerald-400',
+      }
+    case 'CANCELLED':
+      return {
+        icon: 'text-red-500 dark:text-red-400',
+        value: 'text-red-500 dark:text-red-400',
+      }
+    default:
+      return {
+        icon: 'text-gray-500 dark:text-gray-400',
+        value: 'text-gray-500 dark:text-gray-400',
+      }
+  }
 }
 
 const Orders = () => {
@@ -200,77 +243,93 @@ const Orders = () => {
   }
 
   const statCards = [
-    { label: 'Waiting', value: stats.PENDING, desc: 'orders waiting to be processed' },
-    { label: 'In Progress', value: stats.PROCESSING, desc: 'orders currently being processed' },
-    { label: 'Completed (unpaid)', value: stats.COMPLETED, desc: 'completed but unpaid orders' },
-    { label: 'Cancelled', value: stats.CANCELLED, desc: 'Cancelled orders' },
+    { key: 'PENDING', label: 'Waiting', value: stats.PENDING, desc: 'orders waiting to be processed', icon: 'schedule' },
+    { key: 'PROCESSING', label: 'In Progress', value: stats.PROCESSING, desc: 'orders currently being processed', icon: 'build' },
+    { key: 'COMPLETED', label: 'Completed (unpaid)', value: stats.COMPLETED, desc: 'completed but unpaid orders', icon: 'assignment_turned_in' },
+    { key: 'CANCELLED', label: 'Cancelled', value: stats.CANCELLED, desc: 'Cancelled orders', icon: 'cancel' },
   ]
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Active Orders</h1>
-          <div className="flex flex-col gap-2 items-end">
-            <div className="flex flex-row gap-2 items-center">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Date range:</span>
-              <button type="button" className="btn btn-ghost btn-xs" onClick={() => applyPreset(0)}>Today</button>
-              <button type="button" className="btn btn-ghost btn-xs" onClick={() => applyPreset(7)}>Last 7 days</button>
-              <button type="button" className="btn btn-ghost btn-xs" onClick={() => applyPreset(30)}>Last 30 days</button>
-              {dateRangeLabel && (
-                <span className="badge badge-primary badge-outline ml-2">{dateRangeLabel}</span>
-              )}
-              {dateRangeLabel && (
-                <button type="button" className="btn btn-ghost btn-xs" onClick={clearDates}>Clear</button>
-              )}
-            </div>
-            <div className="flex flex-row gap-2 items-center">
-              <div className="flex flex-row gap-2 items-center">
-                <label className="text-sm text-gray-600 dark:text-gray-300">From:</label>
-                <input
-                  type="date"
-                  className="input input-bordered input-sm"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-              </div>
-              <div className="flex flex-row gap-2 items-center">
-                <label className="text-sm text-gray-600 dark:text-gray-300">To:</label>
-                <input
-                  type="date"
-                  className="input input-bordered input-sm"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-              </div>
-              <input
-                type="text"
-                className="input input-bordered input-sm w-64"
-                placeholder="Search orders..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <Link to="/orders/create" className="btn btn-primary btn-sm">Add Order</Link>
-            </div>
-          </div>
+          <Link to="/orders/create" className="btn btn-primary btn-sm">
+            <span className="material-symbols-outlined">add</span>
+            Add Order
+          </Link>
         </div>
 
-      <div className="flex flex-row gap-4">
-        {statCards.map((card) => (
-          <div key={card.label} className="flex-1 card bg-white dark:bg-gray-950 p-4 rounded-lg shadow-md">
-            <div className="flex flex-col gap-2">
-              <p className="text-lg font-medium text-gray-900 dark:text-white">{card.label}</p>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{card.value}</h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{card.desc}.</p>
+        {/* Toolbar */}
+        <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between p-4 bg-white dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-800">
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Date Range</span>
+            <div className="join join-sm">
+              <button type="button" className="btn join-item btn-ghost btn-xs" onClick={() => applyPreset(0)}>Today</button>
+              <button type="button" className="btn join-item btn-ghost btn-xs" onClick={() => applyPreset(7)}>Last 7 days</button>
+              <button type="button" className="btn join-item btn-ghost btn-xs" onClick={() => applyPreset(30)}>Last 30 days</button>
             </div>
           </div>
-        ))}
+
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center w-full xl:w-auto">
+            <div className="flex flex-row gap-2 items-center">
+              <input
+                type="date"
+                className="input input-bordered input-sm"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+              <span className="text-gray-400 dark:text-gray-500">→</span>
+              <input
+                type="date"
+                className="input input-bordered input-sm"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+              {dateRangeLabel && (
+                <button type="button" className="btn btn-ghost btn-xs" onClick={clearDates}>
+                  <span className="material-symbols-outlined text-sm">close</span>
+                  Clear
+                </button>
+              )}
+            </div>
+            <input
+              type="text"
+              className="input input-bordered input-sm w-full sm:w-64"
+              placeholder="Search orders..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="flex flex-row gap-2 overflow-x-auto pb-1">
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {statCards.map((card) => {
+          const colors = getStatColorClasses(card.key)
+          return (
+            <div key={card.key} className="flex flex-col gap-2 p-4 bg-white dark:bg-gray-950 rounded-lg shadow border border-gray-200 dark:border-gray-800">
+              <div className="flex flex-row items-center justify-between gap-3">
+                <span className={`material-symbols-outlined text-2xl ${colors.icon}`}>{card.icon}</span>
+                <span className={`text-2xl font-bold ${colors.value}`}>{card.value}</span>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-gray-900 dark:text-white">{card.label}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{card.desc}</div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Filters */}
+      <div className="tabs tabs-boxed bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 p-1 rounded-xl w-fit">
         {FILTERS.map(({ key, label }) => (
           <button
             key={key}
-            className={`btn btn-ghost btn-sm ${filter === key ? 'btn-active' : ''}`}
+            className={`tab tab-sm gap-2 ${filter === key ? 'tab-active' : ''}`}
             onClick={() => setFilter(key)}
           >
             {key === 'all' ? `${label} (${totalCount})` : `${label} (${stats[key] || 0})`}
@@ -278,45 +337,52 @@ const Orders = () => {
         ))}
       </div>
 
-      <div className="card bg-white dark:bg-gray-950 rounded-lg shadow-md overflow-hidden">
+      {/* Error */}
+      {error && (
+        <div className="alert alert-error">
+          <span className="material-symbols-outlined">error</span>
+          <span>{error}</span>
+          <button className="btn btn-ghost btn-sm" onClick={() => setRefetchKey((k) => k + 1)}>Retry</button>
+        </div>
+      )}
+
+      {/* Table Card */}
+      <div className="card bg-white dark:bg-gray-950 rounded-xl shadow-md border border-gray-200 dark:border-gray-800 overflow-hidden">
         <div className="overflow-x-auto">
           {loading ? (
-            <div className="p-8 text-center">
+            <div className="p-12 text-center">
               <span className="loading loading-spinner loading-lg text-indigo-600"></span>
-            </div>
-          ) : error ? (
-            <div className="p-8 text-center">
-              <p className="text-error">{error}</p>
-              <button className="btn btn-ghost btn-sm mt-2" onClick={() => setRefetchKey((k) => k + 1)}>Retry</button>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Loading orders...</p>
             </div>
           ) : filtered.length === 0 ? (
-            <div className="p-8 text-center">
+            <div className="p-12 text-center">
+              <span className="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600 mb-3">inventory_2</span>
               <p className="text-gray-500 dark:text-gray-400">No orders found.</p>
             </div>
           ) : (
-            <table className="table">
-              <thead>
+            <table className="table table-zebra">
+              <thead className="bg-gray-50 dark:bg-gray-900/50">
                 <tr>
-                  <th className="cursor-pointer" onClick={() => requestSort('id')}>
-                    ID {sortKey === 'id' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('id')}>
+                    <div className="flex items-center gap-1">ID <SortIndicator active={sortKey === 'id'} direction={sortDirection} /></div>
                   </th>
-                  <th className="cursor-pointer" onClick={() => requestSort('vehicle')}>
-                    Vehicle {sortKey === 'vehicle' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('vehicle')}>
+                    <div className="flex items-center gap-1">Vehicle <SortIndicator active={sortKey === 'vehicle'} direction={sortDirection} /></div>
                   </th>
-                  <th className="cursor-pointer" onClick={() => requestSort('customer')}>
-                    Customer {sortKey === 'customer' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('customer')}>
+                    <div className="flex items-center gap-1">Customer <SortIndicator active={sortKey === 'customer'} direction={sortDirection} /></div>
                   </th>
-                  <th className="cursor-pointer" onClick={() => requestSort('staff')}>
-                    Staff {sortKey === 'staff' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('staff')}>
+                    <div className="flex items-center gap-1">Staff <SortIndicator active={sortKey === 'staff'} direction={sortDirection} /></div>
                   </th>
-                  <th className="cursor-pointer" onClick={() => requestSort('services')}>
-                    Services {sortKey === 'services' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('services')}>
+                    <div className="flex items-center gap-1">Services <SortIndicator active={sortKey === 'services'} direction={sortDirection} /></div>
                   </th>
-                  <th className="cursor-pointer" onClick={() => requestSort('status')}>
-                    Status {sortKey === 'status' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('status')}>
+                    <div className="flex items-center gap-1">Status <SortIndicator active={sortKey === 'status'} direction={sortDirection} /></div>
                   </th>
-                  <th className="cursor-pointer" onClick={() => requestSort('created')}>
-                    Created {sortKey === 'created' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                  <th className="cursor-pointer select-none" onClick={() => requestSort('created')}>
+                    <div className="flex items-center gap-1">Created <SortIndicator active={sortKey === 'created'} direction={sortDirection} /></div>
                   </th>
                   <th className="text-right">Actions</th>
                 </tr>

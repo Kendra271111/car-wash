@@ -1,9 +1,11 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
+import { toPng } from "html-to-image";
 import { Link, useParams, useNavigate } from "react-router";
 import orderController, {
   statusColors,
   statusLabels,
 } from "../../../controllers/orderController.js";
+import { pdf, Document, Page, View, Image, StyleSheet } from "@react-pdf/renderer";
 
 const formatDate = (dateString) => {
   if (!dateString) return "-";
@@ -241,6 +243,8 @@ const OrderActions = ({ order, payment, onComplete, completing, onPrint }) => {
 };
 
 const InvoiceModal = ({ order, payment, onClose }) => {
+  const invoiceRef = useRef(null);
+  const [downloading, setDownloading] = useState(false);
   if (!order || !onClose) return null;
   const status = order.status || "PENDING";
   const totalAmount = (order.order_items || []).reduce((sum, item) => sum + Number(item.subtotal || 0), 0);
@@ -248,14 +252,58 @@ const InvoiceModal = ({ order, payment, onClose }) => {
   const serviceCount = (order.order_items || []).reduce((sum, item) => sum + (item.qty || 0), 0);
   const totalDuration = (order.order_items || []).reduce((sum, item) => sum + (item.duration || 0), 0);
 
+  const handleDownloadPDF = async () => {
+    if (!invoiceRef.current || downloading) return;
+    setDownloading(true);
+    try {
+      const dataUrl = await toPng(invoiceRef.current, {
+        quality: 1,
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
+      });
+
+      const InvoicePDFDocument = () => (
+        <Document>
+          <Page size="A4" style={pdfStyles.page}>
+            <Image src={dataUrl} style={pdfStyles.image} />
+          </Page>
+        </Document>
+      );
+
+      const blob = await pdf(<InvoicePDFDocument />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `invoice-order-${order.id}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to generate PDF:", err);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const pdfStyles = StyleSheet.create({
+    page: {
+      padding: 0,
+      flexDirection: "row",
+      backgroundColor: "#ffffff",
+    },
+    image: {
+      width: "100%",
+      height: "auto",
+    },
+  });
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-900 w-full max-w-xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div ref={invoiceRef} className="relative bg-white dark:bg-gray-900 w-full max-w-xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
         <div className="p-8">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">CAR WASH</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">WASHINGTON</h1>
               <p className="text-sm text-gray-500 dark:text-gray-400">Service Ticket</p>
             </div>
             <div className="text-right">
@@ -373,6 +421,9 @@ const InvoiceModal = ({ order, payment, onClose }) => {
             <p className="text-xs text-gray-400 dark:text-gray-500">Staff: {order.staff?.name || `Staff #${order.staffId}`}</p>
             <div className="flex gap-2">
               <button className="btn btn-ghost btn-sm" onClick={onClose}>Close</button>
+              <button className="btn btn-primary btn-sm" onClick={handleDownloadPDF} disabled={downloading}>
+                {downloading ? "Generating..." : "Download PDF"}
+              </button>
             </div>
           </div>
         </div>

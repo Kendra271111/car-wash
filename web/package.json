@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@react-native-vector-icons/material-icons": "^13.1.2",
+    "@react-pdf/renderer": "^4.6.0",
     "@tailwindcss/vite": "^4.3.3",
     "axios": "^1.19.0",
     "express": "^5.2.1",
