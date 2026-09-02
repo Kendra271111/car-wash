@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../.prisma/client"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  // no url here
 }
 
 model vehicles {
@@ -51,7 +51,7 @@ model orders {
   id          Int           @id @default(autoincrement())
   vehicleId   Int
   customerId  Int
-  staffId     Int
+  staffId     Int?
   status      String        @default("PENDING")
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @default(now()) @updatedAt
@@ -59,7 +59,7 @@ model orders {
   order_items order_items[]
   customer    customers     @relation(fields: [customerId], references: [id])
   vehicle     vehicles      @relation(fields: [vehicleId], references: [id])
-  staff       staff         @relation(fields: [staffId], references: [id])
+  staff       staff?         @relation(fields: [staffId], references: [id])
   payements   payments[]
 }
 
@@ -68,6 +68,9 @@ model customers {
   name      String
   email     String     @unique
   phone     Int
+  password  String?
+  pfp       String?
+  role      String   @default("USER")
   createdAt DateTime   @default(now())
   orders    orders[]
   vehicles  vehicles[]
@@ -78,8 +81,10 @@ model payments {
   orderId   Int
   amount    Float
   change    Float
-  method    String
+  method    String?
   status    String   @default("PENDING")
+  notes    String?
+  midtransOrderId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
   order     orders   @relation(fields: [orderId], references: [id], onDelete: Cascade)

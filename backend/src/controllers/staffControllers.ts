@@ -32,6 +32,7 @@ export const getStaffById = async (req: Request, res: Response, next: NextFuncti
   try {
     const { id } = req.params;
     const staff = await prisma.staff.findUnique({ where: { id: Number(id) } });
+
     if (!staff) return res.status(404).json({ message: 'Staff not found' });
     return res.status(200).json({ message: 'Staff retrieved successfully', data: staff });
   } catch (error) {
@@ -45,6 +46,7 @@ export const createStaff = async (req: Request, res: Response, next: NextFunctio
     const newStaff = await prisma.staff.create({
       data: { name, email, phone: phone || null, position: position || null, isActive: isActive ?? true },
     });
+
     return res.status(201).json({ message: 'Staff created successfully', data: newStaff });
   } catch (error) {
     next(error);
@@ -59,6 +61,7 @@ export const updateStaff = async (req: Request, res: Response, next: NextFunctio
       where: { id: Number(id) },
       data: { name, email, phone, position, isActive },
     });
+
     return res.status(200).json({ message: 'Staff updated successfully', data: updated });
   } catch (error) {
     next(error);
@@ -69,6 +72,7 @@ export const deleteStaff = async (req: Request, res: Response, next: NextFunctio
   try {
     const { id } = req.params;
     await prisma.staff.delete({ where: { id: Number(id) } });
+    
     return res.status(200).json({ message: 'Staff deleted successfully' });
   } catch (error) {
     next(error);

@@ -1,10 +1,13 @@
-import { PrismaClient } from '../../.prisma/client/client'
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
-import 'dotenv/config';
+import 'dotenv/config' // if not loaded in app entry
+import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+import pg from 'pg'
 
-const pool = new Pool({connectionString: process.env.DATABASE_URL});
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({adapter});
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_POOLER_URL, // must match .env
+})
 
-export default prisma;
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter })
+
+export default prisma
